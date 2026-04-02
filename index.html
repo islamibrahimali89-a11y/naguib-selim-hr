@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نجيب سليم | طلبات الموارد البشرية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #693C0F;
+            --primary-light: #8B5E34;
+            --primary-dark: #4A2A0A;
+            --primary-deeper: #3A2007;
+            --accent: #D4A574;
+            --accent-light: #F0DCC8;
+            --accent-pale: #FAF4ED;
+            --bg: #FDFBF8;
+            --card-bg: #FFFFFF;
+            --text: #2C2218;
+            --text-mid: #5C4A3A;
+            --text-light: #8C7B6B;
+            --border: #E8DFD4;
+            --border-light: #F2ECE4;
+            --success: #2E7D32;
+            --success-bg: #E8F5E9;
+            --error: #B71C1C;
+            --error-bg: #FFF5F5;
+            --warning: #E65100;
+            --warning-bg: #FFF3E0;
+            --blue: #1565C0;
+            --shadow-sm: 0 1px 3px rgba(74,42,10,0.06);
+            --shadow-md: 0 4px 16px rgba(74,42,10,0.08);
+            --shadow-lg: 0 8px 32px rgba(74,42,10,0.12);
+            --radius: 12px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* === HEADER === */
+        .header {
+            background: var(--primary-dark);
+            position: relative;
+            overflow: hidden;
+            padding: 0;
+        }
+        .header-pattern {
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(circle at 20% 50%, rgba(212,165,116,0.12) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(212,165,116,0.08) 0%, transparent 40%);
+        }
+        .header-inner {
+            position: relative;
+            z-index: 1;
+            padding: 32px 24px 28px;
+            text-align: center;
+        }
+        .header-brand {
+            font-family: 'Amiri', serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+        .header-title {
+            font-size: 15px;
+            font-weight: 400;
+            color: rgba(255,255,255,0.7);
+            letter-spacing: 0.3px;
+        }
+        .header-divider {
+            width: 48px;
+            height: 2px;
+            background: var(--accent);
+            margin: 12px auto 0;
+            border-radius: 1px;
+            opacity: 0.6;
+        }
+        .header-bottom-edge {
+            height: 4px;
+            background: linear-gradient(to right, var(--accent), var(--primary-light), var(--accent));
+            opacity: 0.4;
+        }
+
+        /* === FORM CONTAINER === */
+        .container {
+            max-width: 540px;
+            margin: 0 auto;
+            padding: 24px 16px 48px;
+        }
+        .form-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 32px 24px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-light);
+        }
+        .form-section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        /* === FORM FIELDS === */
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 13.5px;
+            margin-bottom: 7px;
+            color: var(--text-mid);
+        }
+        .form-group label .req {
+            color: var(--error);
+            margin-right: 3px;
+            font-size: 11px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            font-family: 'Tajawal', sans-serif;
+            font-size: 14.5px;
+            color: var(--text);
+            background: var(--accent-pale);
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+            outline: none;
+        }
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: var(--text-light);
+            font-size: 13px;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary-light);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(105,60,15,0.07);
+        }
+        .form-group .field-error {
+            border-color: var(--error) !important;
+            background: var(--error-bg) !important;
+        }
+        .form-group .err-text {
+            color: var(--error);
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+            font-weight: 500;
+        }
+        .form-group .err-text.visible { display: block; }
+        .form-group select {
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%23693C0F' viewBox='0 0 16 16'%3E%3Cpath d='M8 12L2 6h12z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: left 14px center;
+            padding-left: 32px;
+        }
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        /* === CONDITIONAL SUB-FIELDS === */
+        .sub-field-box {
+            margin-top: 10px;
+            padding: 14px 16px;
+            background: linear-gradient(135deg, var(--accent-pale) 0%, #FFF8F0 100%);
+            border-radius: 10px;
+            border: 1px solid var(--accent);
+            display: none;
+        }
+        .sub-field-box.open {
+            display: block;
+            animation: slideDown 0.25s ease;
+        }
+        .sub-field-box label {
+            font-size: 12.5px !important;
+            color: var(--primary) !important;
+            font-weight: 600 !important;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* === DATE NOTICE === */
+        .date-notice {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+            padding: 10px 14px;
+            background: var(--warning-bg);
+            border: 1px solid #FFCC80;
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--warning);
+            font-weight: 500;
+        }
+        .date-notice.open { display: flex; }
+
+        /* === SUBMIT BUTTON === */
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 13px;
+            margin-top: 10px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius);
+            font-family: 'Tajawal', sans-serif;
+            font-size: 15.5px;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.4px;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+        }
+        .submit-btn:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 4px 16px rgba(74,42,10,0.2);
+            transform: translateY(-1px);
+        }
+        .submit-btn:active { transform: translateY(0); }
+        .submit-btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        .submit-btn .spinner {
+            display: inline-block;
+            width: 18px; height: 18px;
+            border: 2.5px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            vertical-align: middle;
+            margin-left: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* === SUCCESS MODAL === */
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(44,34,24,0.55);
+            backdrop-filter: blur(6px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .overlay.open { display: flex; }
+        .modal-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 36px 28px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            animation: modalIn 0.35s ease;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.92) translateY(12px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-icon {
+            width: 60px; height: 60px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 14px;
+        }
+        .modal-icon svg { width: 28px; height: 28px; }
+        .modal-card h3 {
+            font-size: 19px;
+            color: var(--primary-dark);
+            margin-bottom: 6px;
+        }
+        .modal-ticket {
+            display: inline-block;
+            background: var(--accent-pale);
+            border: 1px solid var(--accent);
+            padding: 7px 20px;
+            border-radius: 8px;
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--primary);
+            direction: ltr;
+            margin: 10px 0 8px;
+            letter-spacing: 0.5px;
+        }
+        .modal-card p {
+            color: var(--text-light);
+            font-size: 13.5px;
+            line-height: 1.7;
+        }
+        .modal-sla {
+            margin-top: 12px;
+            padding: 9px 14px;
+            background: var(--success-bg);
+            border-radius: 8px;
+            color: var(--success);
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .modal-close {
+            margin-top: 18px;
+            padding: 10px 36px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .modal-close:hover { background: var(--primary-dark); }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 11px;
+            color: var(--text-light);
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="header-pattern"></div>
+    <div class="header-inner">
+        <div class="header-brand">نجيب سليم</div>
+        <div class="header-title">نموذج طلبات الموارد البشرية</div>
+        <div class="header-divider"></div>
+    </div>
+    <div class="header-bottom-edge"></div>
+</div>
+
+<!-- FORM -->
+<div class="container">
+    <div class="form-card">
+        <div class="form-section-title">بيانات الموظف</div>
+
+        <!-- Employee ID -->
+        <div class="form-group">
+            <label><span class="req">*</span> الرقم الوظيفي</label>
+            <input type="text" id="empId" placeholder="أدخل الرقم الوظيفي (من 1 إلى 4 أرقام)" maxlength="5" inputmode="numeric" autocomplete="off">
+            <div class="err-text" id="empIdErr">الرقم الوظيفي غير صحيح — يجب أن يكون من 1 إلى 4 أرقام فقط</div>
+        </div>
+
+        <!-- Phone -->
+        <div class="form-group">
+            <label><span class="req">*</span> رقم الهاتف للتواصل</label>
+            <input type="text" id="phone" placeholder="01XXXXXXXXX" maxlength="11" inputmode="tel" dir="ltr" style="text-align:right;" autocomplete="off">
+            <div class="err-text" id="phoneErr">رقم الهاتف غير صحيح — يجب أن يكون 11 رقم</div>
+        </div>
+
+        <!-- Department -->
+        <div class="form-group">
+            <label><span class="req">*</span> الإدارة</label>
+            <select id="department">
+                <option value="">— اختر الإدارة —</option>
+                <option value="المبيعات">المبيعات</option>
+                <option value="سلاسل الامداد">سلاسل الامداد</option>
+                <option value="خدمة العملاء">خدمة العملاء</option>
+                <option value="التصنيع">التصنيع</option>
+                <option value="دعم الاعمال">دعم الاعمال</option>
+                <option value="تكنولوجيا المعلومات">تكنولوجيا المعلومات</option>
+                <option value="الحسابات">الحسابات</option>
+                <option value="شركة الجملة">شركة الجملة</option>
+            </select>
+        </div>
+
+        <div class="form-section-title" style="margin-top:24px;">تفاصيل الطلب</div>
+
+        <!-- Request Type -->
+        <div class="form-group">
+            <label><span class="req">*</span> نوع الطلب</label>
+            <select id="requestType" onchange="onRequestTypeChange()">
+                <option value="">— اختر نوع الطلب —</option>
+                <option value="1">طلب الحصول على مفردات المرتب</option>
+                <option value="2">استعلام عن رصيد الاجازات</option>
+                <option value="3">طلب سجل حضور / انصراف</option>
+                <option value="4">جواب HR Letter</option>
+                <option value="5">تقديم شكوى</option>
+                <option value="6">طلب ختم لأوراق البطاقة</option>
+                <option value="7">طلب سلفة</option>
+                <option value="8">الإبلاغ عن مخالفة</option>
+            </select>
+
+            <div class="date-notice" id="dateNotice">
+                <svg width="15" height="15" fill="none" stroke="#E65100" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span>هذا الطلب متاح فقط من يوم 1 إلى يوم 5 من كل شهر</span>
+            </div>
+
+            <!-- HR Letter destination -->
+            <div class="sub-field-box" id="subHrLetter">
+                <div class="form-group" style="margin-bottom:0;">
+                    <label><span class="req">*</span> برجاء تحديد الجهة الموجه لها الخطاب</label>
+                    <input type="text" id="hrLetterDest" placeholder="مثال: السفارة الأمريكية / البنك الأهلي">
+                </div>
+            </div>
+
+            <!-- Complaint reasons -->
+            <div class="sub-field-box" id="subComplaint">
+                <div class="form-group" style="margin-bottom:0;">
+                    <label><span class="req">*</span> سبب الشكوى</label>
+                    <select id="complaintReason">
+                        <option value="">— اختر السبب —</option>
+                        <option value="تعامل غير لائق">تعامل غير لائق</option>
+                        <option value="خصم غير مستحق">خصم غير مستحق</option>
+                        <option value="مشكلة مع مدير">مشكلة مع مدير</option>
+                        <option value="مشكلة مع زميل">مشكلة مع زميل</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Violation reasons -->
+            <div class="sub-field-box" id="subViolation">
+                <div class="form-group" style="margin-bottom:0;">
+                    <label><span class="req">*</span> نوع المخالفة</label>
+                    <select id="violationReason">
+                        <option value="">— اختر النوع —</option>
+                        <option value="بضاعة ملقاة في الشارع">بضاعة ملقاة في الشارع</option>
+                        <option value="إنذار الحريق لا يعمل">إنذار الحريق لا يعمل</option>
+                        <option value="انقطاع الكهرباء">انقطاع الكهرباء</option>
+                        <option value="سرقة">سرقة</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comment -->
+        <div class="form-group">
+            <label>تعليق إضافي</label>
+            <textarea id="comment" placeholder="أضف أي ملاحظات أو تفاصيل هنا..."></textarea>
+        </div>
+
+        <button class="submit-btn" id="submitBtn" onclick="submitRequest()">
+            إرسال الطلب
+        </button>
+    </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="overlay" id="successOverlay">
+    <div class="modal-card">
+        <div class="modal-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3>تم استلام طلبكم بنجاح</h3>
+        <div class="modal-ticket" id="modalTicket"></div>
+        <p>تم تسجيل الطلب وسيتم الرد عليكم</p>
+        <div class="modal-sla" id="modalSla"></div>
+        <button class="modal-close" onclick="closeModal()">حسناً</button>
+    </div>
+</div>
+
+<div class="footer">© 2026 نجيب سليم — إدارة الموارد البشرية</div>
+
+<script>
+// ============ SUPABASE CONFIG ============
+// ⚠️ استبدل القيم دي بقيمك من Supabase Dashboard → Settings → API
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ============ CONSTANTS ============
+const SLA_MAP = {
+    '1': 'خلال 24 ساعة', '2': 'خلال 24 ساعة', '3': 'خلال 24 ساعة',
+    '4': 'خلال 48 ساعة',
+    '5': 'خلال 3 إلى 5 أيام عمل', '6': 'خلال 3 إلى 5 أيام عمل', '7': 'خلال 3 إلى 5 أيام عمل',
+    '8': 'خلال نفس اليوم'
+};
+const SLA_HOURS = { '1':24,'2':24,'3':24,'4':48,'5':120,'6':120,'7':120,'8':8 };
+const REQUEST_NAMES = {
+    '1':'طلب الحصول على مفردات المرتب','2':'استعلام عن رصيد الاجازات',
+    '3':'طلب سجل حضور / انصراف','4':'جواب HR Letter',
+    '5':'تقديم شكوى','6':'طلب ختم لأوراق البطاقة',
+    '7':'طلب سلفة','8':'الإبلاغ عن مخالفة'
+};
+
+// ============ UI LOGIC ============
+function onRequestTypeChange() {
+    const v = document.getElementById('requestType').value;
+    document.getElementById('subHrLetter').classList.toggle('open', v === '4');
+    document.getElementById('subComplaint').classList.toggle('open', v === '5');
+    document.getElementById('subViolation').classList.toggle('open', v === '8');
+    document.getElementById('dateNotice').classList.toggle('open', v === '1');
+}
+
+function showErr(id, errId, show) {
+    const el = document.getElementById(id);
+    const er = document.getElementById(errId);
+    el.classList.toggle('field-error', show);
+    er.classList.toggle('visible', show);
+    return !show;
+}
+
+function generateTicket() {
+    const d = new Date();
+    const y = d.getFullYear().toString().slice(2);
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    return `HR-${y}${m}-${Math.floor(1000+Math.random()*9000)}`;
+}
+
+// Real-time input cleanup
+document.getElementById('empId').addEventListener('input', function() {
+    this.value = this.value.replace(/\D/g,'');
+    if (this.value.length > 4) showErr('empId','empIdErr',true);
+    else showErr('empId','empIdErr',false);
+});
+document.getElementById('phone').addEventListener('input', function() {
+    this.value = this.value.replace(/\D/g,'');
+});
+
+// ============ SUBMIT ============
+async function submitRequest() {
+    const empId = document.getElementById('empId').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const dept = document.getElementById('department').value;
+    const reqType = document.getElementById('requestType').value;
+    let ok = true;
+
+    if (!showErr('empId','empIdErr', !/^\d{1,4}$/.test(empId))) ok = false;
+    if (!showErr('phone','phoneErr', !/^\d{11}$/.test(phone))) ok = false;
+    if (!dept) { ok = false; document.getElementById('department').classList.add('field-error'); }
+    else document.getElementById('department').classList.remove('field-error');
+    if (!reqType) { ok = false; document.getElementById('requestType').classList.add('field-error'); }
+    else document.getElementById('requestType').classList.remove('field-error');
+
+    // Date restriction for option 1
+    if (reqType === '1' && new Date().getDate() > 5) {
+        alert('عذراً، طلب مفردات المرتب متاح فقط من يوم 1 إلى يوم 5 من كل شهر.');
+        return;
+    }
+
+    // Sub-field validation
+    if (reqType === '4' && !document.getElementById('hrLetterDest').value.trim()) {
+        ok = false; document.getElementById('hrLetterDest').classList.add('field-error');
+    }
+    if (reqType === '5' && !document.getElementById('complaintReason').value) {
+        ok = false; document.getElementById('complaintReason').classList.add('field-error');
+    }
+    if (reqType === '8' && !document.getElementById('violationReason').value) {
+        ok = false; document.getElementById('violationReason').classList.add('field-error');
+    }
+
+    if (!ok) return;
+
+    // Show loading
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = 'جاري الإرسال... <span class="spinner"></span>';
+
+    const ticket = generateTicket();
+    const record = {
+        ticket,
+        emp_id: empId,
+        phone,
+        department: dept,
+        request_type: reqType,
+        request_name: REQUEST_NAMES[reqType],
+        hr_letter_dest: reqType==='4' ? document.getElementById('hrLetterDest').value.trim() : '',
+        complaint_reason: reqType==='5' ? document.getElementById('complaintReason').value : '',
+        violation_reason: reqType==='8' ? document.getElementById('violationReason').value : '',
+        comment: document.getElementById('comment').value.trim(),
+        sla_text: SLA_MAP[reqType],
+        sla_hours: SLA_HOURS[reqType],
+        status: 'لم يتم العمل عليه'
+    };
+
+    const { error } = await supabase.from('hr_requests').insert([record]);
+
+    btn.disabled = false;
+    btn.innerHTML = 'إرسال الطلب';
+
+    if (error) {
+        console.error(error);
+        alert('حدث خطأ أثناء إرسال الطلب. برجاء المحاولة مرة أخرى.');
+        return;
+    }
+
+    // Show success modal
+    document.getElementById('modalTicket').textContent = ticket;
+    document.getElementById('modalSla').textContent = SLA_MAP[reqType];
+    document.getElementById('successOverlay').classList.add('open');
+
+    // Reset form
+    ['empId','phone','comment','hrLetterDest'].forEach(id => document.getElementById(id).value = '');
+    ['department','requestType','complaintReason','violationReason'].forEach(id => document.getElementById(id).value = '');
+    onRequestTypeChange();
+}
+
+function closeModal() {
+    document.getElementById('successOverlay').classList.remove('open');
+}
+</script>
+</body>
+</html>
