@@ -101,6 +101,12 @@
         <select id="fS" onchange="load()"><option value="">كل الحالات</option><option value="لم يتم العمل عليه">لم يتم العمل عليه</option><option value="قيد التنفيذ">قيد التنفيذ</option><option value="تم الانتهاء">تم الانتهاء</option></select>
         <select id="fT" onchange="load()"><option value="">كل الأنواع</option><option value="1">مفردات المرتب</option><option value="2">رصيد اجازات</option><option value="3">سجل حضور</option><option value="4">HR Letter</option><option value="5">شكوى</option><option value="6">ختم أوراق</option><option value="7">سلفة</option><option value="8">إبلاغ مخالفة</option></select>
         <input type="text" id="fQ" placeholder="بحث برقم الطلب..." oninput="load()">
+        <span style="font-size:11px;color:var(--text-light)">|</span>
+        <label style="font-size:11px;color:var(--text-mid)">من</label>
+        <input type="date" id="dFrom" onchange="load()" style="padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-family:'Tajawal',sans-serif;font-size:11px;outline:none">
+        <label style="font-size:11px;color:var(--text-mid)">إلى</label>
+        <input type="date" id="dTo" onchange="load()" style="padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-family:'Tajawal',sans-serif;font-size:11px;outline:none">
+        <button onclick="document.getElementById('dFrom').value='';document.getElementById('dTo').value='';load()" style="padding:5px 10px;background:var(--err-bg);color:var(--err);border:none;border-radius:5px;font-family:'Tajawal',sans-serif;font-size:10px;font-weight:700;cursor:pointer">✕</button>
         <button class="tbtn tbtn-r" onclick="load()">🔄 تحديث</button>
         <button class="tbtn tbtn-e" onclick="expCSV()">📥 تصدير Excel</button>
     </div>
@@ -161,10 +167,14 @@ async function load() {
     const fs = document.getElementById('fS').value;
     const ft = document.getElementById('fT').value;
     const fq = document.getElementById('fQ').value.trim().toLowerCase();
+    const dfrom = document.getElementById('dFrom').value;
+    const dto = document.getElementById('dTo').value;
     if (fd) q = q.eq('department', fd);
     if (fs) q = q.eq('status', fs);
     if (ft) q = q.eq('request_type', ft);
     if (fq) q = q.ilike('ticket', `%${fq}%`);
+    if (dfrom) q = q.gte('submitted_at', dfrom + 'T00:00:00');
+    if (dto) q = q.lte('submitted_at', dto + 'T23:59:59');
     const { data } = await q;
     ALL = data || [];
     render(ALL);
