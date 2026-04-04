@@ -3,381 +3,394 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نجيب سليم | لوحة الإدارة</title>
+    <title>نجيب سليم | لوحة الإدارة - HR Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
     <style>
-        :root{--primary:#693C0F;--primary-light:#8B5E34;--primary-dark:#4A2A0A;--accent:#D4A574;--accent-light:#F0DCC8;--accent-pale:#FAF4ED;--bg:#F4F1EC;--card-bg:#FFFFFF;--text:#2C2218;--text-mid:#5C4A3A;--text-light:#8C7B6B;--border:#E8DFD4;--border-light:#F2ECE4;--success:#2E7D32;--success-bg:#E8F5E9;--error:#B71C1C;--error-bg:#FFEBEE;--blue:#1565C0;--blue-bg:#E3F2FD;--warning:#E65100;--warning-bg:#FFF3E0;--purple:#7B1FA2;--shadow-md:0 4px 16px rgba(74,42,10,0.08);}
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+        :root{--primary:#693C0F;--primary-light:#8B5E34;--primary-dark:#4A2A0A;--accent:#D4A574;--accent-light:#F0DCC8;--accent-pale:#FAF4ED;--bg:#F4F1EC;--card:#FFFFFF;--text:#2C2218;--text-mid:#5C4A3A;--text-light:#8C7B6B;--border:#E8DFD4;--border-lt:#F2ECE4;--ok:#2E7D32;--ok-bg:#E8F5E9;--err:#B71C1C;--err-bg:#FFEBEE;--blue:#1565C0;--blue-bg:#E3F2FD;--warn:#E65100;--warn-bg:#FFF3E0;--purp:#7B1FA2;--shadow:0 4px 16px rgba(74,42,10,.07)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 
-        /* LOGIN */
-        .login-overlay{position:fixed;inset:0;background:linear-gradient(160deg,#2A1505,var(--primary-dark),var(--primary));display:flex;align-items:center;justify-content:center;z-index:9999;}
-        .login-overlay.hidden{display:none;}
-        .login-box{background:#fff;border-radius:20px;padding:40px 30px;width:90%;max-width:380px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.35);}
-        .login-logo{width:74px;height:74px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-family:'Amiri',serif;font-size:30px;color:var(--accent);font-weight:700;box-shadow:0 4px 20px rgba(105,60,15,0.3);}
-        .login-box h2{font-size:19px;color:var(--primary-dark);margin-bottom:4px;}
-        .login-box .sub{font-size:12px;color:var(--text-light);margin-bottom:22px;}
-        .login-box input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:14px;margin-bottom:10px;outline:none;text-align:right;}
-        .login-box input:focus{border-color:var(--primary);}
-        .lbtn{width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-family:'Tajawal',sans-serif;font-size:15px;font-weight:700;cursor:pointer;}
-        .lbtn:hover{background:var(--primary-dark);}
-        .lerr{color:var(--error);font-size:12px;margin-top:8px;display:none;}.lerr.show{display:block;}
+        /* ===== LOGIN ===== */
+        .lo{position:fixed;inset:0;background:linear-gradient(160deg,#2A1505,var(--primary-dark),var(--primary));display:flex;align-items:center;justify-content:center;z-index:9999}
+        .lo.h{display:none}
+        .lb{background:#fff;border-radius:20px;padding:38px 28px;width:90%;max-width:370px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+        .ll{width:72px;height:72px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-family:'Amiri',serif;font-size:30px;color:var(--accent);font-weight:700;box-shadow:0 4px 20px rgba(105,60,15,.3)}
+        .lb h2{font-size:18px;color:var(--primary-dark);margin-bottom:3px}
+        .lb .sp{font-size:12px;color:var(--text-light);margin-bottom:20px}
+        .lb input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:14px;margin-bottom:10px;outline:none;text-align:right}
+        .lb input:focus{border-color:var(--primary)}
+        .lbn{width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-family:'Tajawal',sans-serif;font-size:15px;font-weight:700;cursor:pointer}
+        .lbn:hover{background:var(--primary-dark)}
+        .le{color:var(--err);font-size:12px;margin-top:8px;display:none}.le.s{display:block}
 
-        /* DASHBOARD */
-        .dash{display:none;}.dash.show{display:block;}
-        .dash-header{background:var(--primary-dark);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
-        .dash-header h1{color:#fff;font-size:20px;font-weight:800;}
-        .dash-header .sp{color:rgba(255,255,255,0.5);font-size:11px;}
-        .dash-header-btns{display:flex;gap:8px;}
-        .dash-header-btns button{background:rgba(255,255,255,0.1);color:#fff;border:none;padding:7px 16px;border-radius:8px;font-family:'Tajawal',sans-serif;font-size:12px;cursor:pointer;}
-        .dash-header-btns button:hover{background:rgba(255,255,255,0.2);}
-        .dash-header-btns .active-tab{background:var(--accent);color:var(--primary-dark);font-weight:700;}
-        .accent-bar{height:3px;background:linear-gradient(to right,var(--accent),var(--primary-light),var(--accent));opacity:0.4;}
-
-        .dash-content{max-width:1200px;margin:0 auto;padding:20px 16px;}
+        /* ===== DASHBOARD ===== */
+        .dash{display:none}.dash.s{display:block}
+        .dh{background:var(--primary-dark);padding:14px 22px;display:flex;align-items:center;justify-content:space-between}
+        .dh h1{color:#fff;font-size:19px;font-weight:800}
+        .dh .sp{color:rgba(255,255,255,.45);font-size:11px}
+        .dh-btns{display:flex;gap:6px}
+        .dh-btns button{background:rgba(255,255,255,.1);color:#fff;border:none;padding:6px 14px;border-radius:7px;font-family:'Tajawal',sans-serif;font-size:11.5px;cursor:pointer}
+        .dh-btns button:hover{background:rgba(255,255,255,.2)}
+        .dh-btns .at{background:var(--accent);color:var(--primary-dark);font-weight:700}
+        .abar{height:3px;background:linear-gradient(to right,var(--accent),var(--primary-light),var(--accent));opacity:.35}
+        .dc{max-width:1180px;margin:0 auto;padding:18px 14px}
 
         /* TABS */
-        .tab-content{display:none;}.tab-content.active{display:block;}
+        .tc{display:none}.tc.a{display:block}
 
-        /* KPIs */
-        .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:22px;}
-        .kpi{background:var(--card-bg);border-radius:14px;padding:18px;box-shadow:var(--shadow-md);border-right:4px solid transparent;transition:transform 0.2s;}
-        .kpi:hover{transform:translateY(-2px);}
-        .kpi .kl{font-size:12px;color:var(--text-light);margin-bottom:4px;}
-        .kpi .kv{font-size:30px;font-weight:800;}
-        .kpi .ks{font-size:11px;color:var(--text-light);margin-top:2px;}
-        .kpi-total{border-right-color:var(--primary);}.kpi-total .kv{color:var(--primary);}
-        .kpi-pend{border-right-color:var(--error);}.kpi-pend .kv{color:var(--error);}
-        .kpi-prog{border-right-color:var(--blue);}.kpi-prog .kv{color:var(--blue);}
-        .kpi-done{border-right-color:var(--success);}.kpi-done .kv{color:var(--success);}
-        .kpi-sla{border-right-color:var(--warning);}.kpi-sla .kv{color:var(--warning);}
-        .kpi-comp{border-right-color:var(--purple);}.kpi-comp .kv{color:var(--purple);}
+        /* KPI */
+        .kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:18px}
+        .kp{background:var(--card);border-radius:13px;padding:16px;box-shadow:var(--shadow);border-right:4px solid transparent;transition:transform .2s}
+        .kp:hover{transform:translateY(-2px)}
+        .kl{font-size:11.5px;color:var(--text-light);margin-bottom:3px}
+        .kv{font-size:28px;font-weight:800}
+        .ks{font-size:10.5px;color:var(--text-light);margin-top:1px}
+        .k-total{border-right-color:var(--primary)}.k-total .kv{color:var(--primary)}
+        .k-pend{border-right-color:var(--err)}.k-pend .kv{color:var(--err)}
+        .k-prog{border-right-color:var(--blue)}.k-prog .kv{color:var(--blue)}
+        .k-done{border-right-color:var(--ok)}.k-done .kv{color:var(--ok)}
+        .k-sla{border-right-color:var(--warn)}.k-sla .kv{color:var(--warn)}
+        .k-comp{border-right-color:var(--purp)}.k-comp .kv{color:var(--purp)}
 
-        .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px;}
-        .chart-card{background:var(--card-bg);border-radius:14px;padding:18px;box-shadow:var(--shadow-md);}
-        .chart-card h3{font-size:14px;color:var(--primary-dark);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border-light);}
+        .cg{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
+        .cc{background:var(--card);border-radius:13px;padding:16px;box-shadow:var(--shadow)}
+        .cc h3{font-size:13px;color:var(--primary-dark);margin-bottom:12px;padding-bottom:7px;border-bottom:1px solid var(--border-lt)}
 
-        .bd-card{background:var(--card-bg);border-radius:14px;padding:18px;box-shadow:var(--shadow-md);margin-bottom:18px;}
-        .bd-card h3{font-size:14px;color:var(--primary-dark);margin-bottom:12px;}
-        .bd-table{width:100%;border-collapse:collapse;}
-        .bd-table th{background:var(--accent-pale);padding:9px 12px;font-size:11px;font-weight:700;color:var(--primary-dark);text-align:right;}
-        .bd-table td{padding:9px 12px;font-size:12px;border-bottom:1px solid var(--border-light);}
-        .bd-table tr:hover{background:rgba(105,60,15,0.02);}
-        .tag-on{background:var(--success-bg);color:var(--success);padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;}
-        .tag-out{background:var(--error-bg);color:var(--error);padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;}
+        .bd{background:var(--card);border-radius:13px;padding:16px;box-shadow:var(--shadow);margin-bottom:16px}
+        .bd h3{font-size:13px;color:var(--primary-dark);margin-bottom:10px}
+        .bt{width:100%;border-collapse:collapse}
+        .bt th{background:var(--accent-pale);padding:8px 10px;font-size:11px;font-weight:700;color:var(--primary-dark);text-align:right}
+        .bt td{padding:8px 10px;font-size:11.5px;border-bottom:1px solid var(--border-lt)}
+        .bt tr:hover{background:rgba(105,60,15,.02)}
+        .tOn{background:var(--ok-bg);color:var(--ok);padding:2px 7px;border-radius:4px;font-size:10.5px;font-weight:700}
+        .tOut{background:var(--err-bg);color:var(--err);padding:2px 7px;border-radius:4px;font-size:10.5px;font-weight:700}
 
-        /* USER MANAGEMENT */
-        .um-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
-        .um-header h3{font-size:16px;color:var(--primary-dark);}
-        .um-add-btn{padding:8px 20px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
-        .um-add-btn:hover{background:var(--primary-dark);}
+        /* ===== USER MANAGEMENT ===== */
+        .umh{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+        .umh h3{font-size:15px;color:var(--primary-dark)}
+        .uma{padding:7px 18px;background:var(--primary);color:#fff;border:none;border-radius:7px;font-family:'Tajawal',sans-serif;font-size:12px;font-weight:700;cursor:pointer}
+        .uma:hover{background:var(--primary-dark)}
+        .ut{width:100%;border-collapse:collapse;background:var(--card);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+        .ut th{background:var(--primary-dark);color:#fff;padding:11px;font-size:11.5px;text-align:right}
+        .ut td{padding:10px 11px;font-size:12.5px;border-bottom:1px solid var(--border-lt)}
+        .ut tr:hover{background:rgba(105,60,15,.02)}
+        .rb{padding:3px 9px;border-radius:10px;font-size:10.5px;font-weight:700}
+        .r-a{background:#F3E5F5;color:var(--purp)}.r-s{background:var(--blue-bg);color:var(--blue)}
+        .ab{padding:3px 9px;border-radius:10px;font-size:10.5px;font-weight:700}
+        .a-y{background:var(--ok-bg);color:var(--ok)}.a-n{background:var(--err-bg);color:var(--err)}
+        .uab{padding:4px 10px;border:none;border-radius:5px;font-family:'Tajawal',sans-serif;font-size:10.5px;font-weight:700;cursor:pointer;margin:0 2px}
+        .uab-d{background:var(--err-bg);color:var(--err)}.uab-d:hover{background:#FFCDD2}
+        .uab-t{background:var(--blue-bg);color:var(--blue)}.uab-t:hover{background:#BBDEFB}
+        .uab-r{background:var(--warn-bg);color:var(--warn)}.uab-r:hover{background:#FFE0B2}
 
-        .um-table{width:100%;border-collapse:collapse;background:var(--card-bg);border-radius:12px;overflow:hidden;box-shadow:var(--shadow-md);}
-        .um-table th{background:var(--primary-dark);color:#fff;padding:12px;font-size:12px;text-align:right;}
-        .um-table td{padding:11px 12px;font-size:13px;border-bottom:1px solid var(--border-light);}
-        .um-table tr:hover{background:rgba(105,60,15,0.02);}
-        .role-badge{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;}
-        .role-admin{background:#F3E5F5;color:var(--purple);}
-        .role-sup{background:var(--blue-bg);color:var(--blue);}
-        .active-badge{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;}
-        .active-y{background:var(--success-bg);color:var(--success);}
-        .active-n{background:var(--error-bg);color:var(--error);}
-        .um-action{padding:5px 12px;border:none;border-radius:6px;font-family:'Tajawal',sans-serif;font-size:11px;font-weight:700;cursor:pointer;margin:0 2px;}
-        .um-del{background:var(--error-bg);color:var(--error);}.um-del:hover{background:#FFCDD2;}
-        .um-toggle{background:var(--blue-bg);color:var(--blue);}.um-toggle:hover{background:#BBDEFB;}
-        .um-reset{background:var(--warning-bg);color:var(--warning);}.um-reset:hover{background:#FFE0B2;}
+        /* MODALS */
+        .mbg{display:none;position:fixed;inset:0;background:rgba(44,34,24,.5);backdrop-filter:blur(4px);z-index:1000;justify-content:center;align-items:center;padding:20px}
+        .mbg.o{display:flex}
+        .mbox{background:#fff;border-radius:16px;padding:26px 22px;max-width:400px;width:100%;box-shadow:0 16px 48px rgba(0,0,0,.2)}
+        .mbox h3{font-size:16px;color:var(--primary-dark);margin-bottom:14px}
+        .mfg{margin-bottom:10px}
+        .mfg label{display:block;font-size:12px;font-weight:600;color:var(--text-mid);margin-bottom:4px}
+        .mfg input,.mfg select{width:100%;padding:9px 11px;border:1.5px solid var(--border);border-radius:7px;font-family:'Tajawal',sans-serif;font-size:13px;outline:none}
+        .mfg input:focus,.mfg select:focus{border-color:var(--primary)}
+        .mbtns{display:flex;gap:8px;margin-top:14px}
+        .mbtns button{flex:1;padding:9px;border:none;border-radius:7px;font-family:'Tajawal',sans-serif;font-size:12px;font-weight:700;cursor:pointer}
+        .mb-s{background:var(--primary);color:#fff}.mb-s:hover{background:var(--primary-dark)}
+        .mb-c{background:var(--border-lt);color:var(--text-mid)}.mb-c:hover{background:var(--border)}
+        .merr{color:var(--err);font-size:11px;margin-top:5px;display:none}.merr.s{display:block}
 
-        /* ADD USER MODAL */
-        .modal-bg{display:none;position:fixed;inset:0;background:rgba(44,34,24,0.5);backdrop-filter:blur(4px);z-index:1000;justify-content:center;align-items:center;padding:20px;}
-        .modal-bg.open{display:flex;}
-        .modal-box{background:#fff;border-radius:16px;padding:28px 24px;max-width:420px;width:100%;box-shadow:0 16px 48px rgba(0,0,0,0.2);}
-        .modal-box h3{font-size:17px;color:var(--primary-dark);margin-bottom:16px;}
-        .modal-box .fg{margin-bottom:12px;}
-        .modal-box label{display:block;font-size:12px;font-weight:600;color:var(--text-mid);margin-bottom:5px;}
-        .modal-box input,.modal-box select{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Tajawal',sans-serif;font-size:13px;outline:none;}
-        .modal-box input:focus,.modal-box select:focus{border-color:var(--primary);}
-        .modal-btns{display:flex;gap:10px;margin-top:16px;}
-        .modal-btns button{flex:1;padding:10px;border:none;border-radius:8px;font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
-        .mbtn-save{background:var(--primary);color:#fff;}.mbtn-save:hover{background:var(--primary-dark);}
-        .mbtn-cancel{background:var(--border-light);color:var(--text-mid);}.mbtn-cancel:hover{background:var(--border);}
-        .modal-err{color:var(--error);font-size:12px;margin-top:6px;display:none;}.modal-err.show{display:block;}
-
-        /* RESET PASSWORD MODAL */
-        .rp-modal{display:none;position:fixed;inset:0;background:rgba(44,34,24,0.5);backdrop-filter:blur(4px);z-index:1001;justify-content:center;align-items:center;padding:20px;}
-        .rp-modal.open{display:flex;}
-
-        @media(max-width:768px){.charts-grid{grid-template-columns:1fr;}.kpi-grid{grid-template-columns:repeat(2,1fr);}.dash-header{flex-direction:column;gap:10px;text-align:center;}}
+        @media(max-width:768px){.cg{grid-template-columns:1fr}.kg{grid-template-columns:repeat(2,1fr)}.dh{flex-direction:column;gap:8px;text-align:center}}
     </style>
 </head>
 <body>
 
 <!-- LOGIN -->
-<div class="login-overlay" id="loginOverlay">
-    <div class="login-box">
-        <div class="login-logo">ن</div>
+<div class="lo" id="loginOv">
+    <div class="lb">
+        <div class="ll">ن</div>
         <h2>لوحة إدارة الموارد البشرية</h2>
-        <p class="sub">نجيب سليم — دخول مسؤول النظام</p>
-        <input type="text" id="loginUser" placeholder="اسم المستخدم" autocomplete="off">
-        <input type="password" id="loginPass" placeholder="كلمة المرور">
-        <button class="lbtn" onclick="doLogin()">تسجيل الدخول</button>
-        <div class="lerr" id="loginErr">بيانات الدخول غير صحيحة أو ليس لديك صلاحية أدمن</div>
+        <p class="sp">نجيب سليم — دخول مسؤول النظام (Admin)</p>
+        <input type="text" id="lUser" placeholder="اسم المستخدم" autocomplete="off">
+        <input type="password" id="lPass" placeholder="كلمة المرور">
+        <button class="lbn" onclick="doLogin()">تسجيل الدخول</button>
+        <div class="le" id="lErr">بيانات الدخول غير صحيحة أو ليس لديك صلاحية أدمن</div>
     </div>
 </div>
 
 <!-- DASHBOARD -->
 <div class="dash" id="dashboard">
-    <div class="dash-header">
+    <div class="dh">
         <div><h1>لوحة التحكم — HR Dashboard</h1><p class="sp">نجيب سليم | إدارة الموارد البشرية</p></div>
-        <div class="dash-header-btns">
-            <button id="tabDashBtn" class="active-tab" onclick="switchTab('dashboard')">📊 الداشبورد</button>
-            <button id="tabUsersBtn" onclick="switchTab('users')">👥 إدارة المستخدمين</button>
+        <div class="dh-btns">
+            <button id="tDBtn" class="at" onclick="swTab('dash')">📊 الداشبورد</button>
+            <button id="tUBtn" onclick="swTab('users')">👥 إدارة المستخدمين</button>
             <button onclick="doLogout()">خروج</button>
         </div>
     </div>
-    <div class="accent-bar"></div>
+    <div class="abar"></div>
 
-    <div class="dash-content">
+    <div class="dc">
         <!-- TAB: DASHBOARD -->
-        <div class="tab-content active" id="tabDash">
-            <div class="kpi-grid">
-                <div class="kpi kpi-total"><div class="kl">إجمالي الطلبات</div><div class="kv" id="kTotal">0</div></div>
-                <div class="kpi kpi-pend"><div class="kl">لم يتم العمل عليه</div><div class="kv" id="kPend">0</div></div>
-                <div class="kpi kpi-prog"><div class="kl">قيد التنفيذ</div><div class="kv" id="kProg">0</div></div>
-                <div class="kpi kpi-done"><div class="kl">تم الانتهاء</div><div class="kv" id="kDone">0</div></div>
-                <div class="kpi kpi-sla"><div class="kl">نسبة تحقيق SLA</div><div class="kv" id="kSLA">—</div><div class="ks" id="kSLASub"></div></div>
-                <div class="kpi kpi-comp"><div class="kl">نسبة الإنجاز الكلية</div><div class="kv" id="kComp">—</div><div class="ks" id="kCompSub"></div></div>
+        <div class="tc a" id="tDash">
+            <div class="kg">
+                <div class="kp k-total"><div class="kl">إجمالي الطلبات المستلمة</div><div class="kv" id="kT">0</div></div>
+                <div class="kp k-pend"><div class="kl">لم يتم العمل عليه</div><div class="kv" id="kP">0</div></div>
+                <div class="kp k-prog"><div class="kl">قيد التنفيذ</div><div class="kv" id="kI">0</div></div>
+                <div class="kp k-done"><div class="kl">تم الانتهاء</div><div class="kv" id="kD">0</div></div>
+                <div class="kp k-sla"><div class="kl">نسبة تحقيق مستوى الخدمة (SLA)</div><div class="kv" id="kS">—</div><div class="ks" id="kSs"></div></div>
+                <div class="kp k-comp"><div class="kl">نسبة الإنجاز الكلية</div><div class="kv" id="kC">—</div><div class="ks" id="kCs"></div></div>
             </div>
 
-            <div class="charts-grid">
-                <div class="chart-card"><h3>توزيع أنواع الطلبات</h3><canvas id="chartType"></canvas></div>
-                <div class="chart-card"><h3>حالة الطلبات</h3><canvas id="chartStatus"></canvas></div>
+            <div class="cg">
+                <div class="cc"><h3>توزيع أنواع الطلبات</h3><canvas id="chType"></canvas></div>
+                <div class="cc"><h3>حالة الطلبات</h3><canvas id="chStat"></canvas></div>
             </div>
 
-            <div class="bd-card"><h3>تحليل الطلبات حسب الإدارة</h3>
-                <table class="bd-table"><thead><tr><th>الإدارة</th><th>الإجمالي</th><th>لم يتم</th><th>قيد التنفيذ</th><th>تم</th><th>Ontime</th><th>Out SLA</th></tr></thead><tbody id="deptTBody"></tbody></table>
+            <div class="bd"><h3>تحليل الطلبات حسب الإدارة</h3>
+                <table class="bt"><thead><tr><th>الإدارة</th><th>الإجمالي</th><th>لم يتم</th><th>قيد التنفيذ</th><th>تم</th><th>Ontime</th><th>Out SLA</th></tr></thead><tbody id="dTB"></tbody></table>
             </div>
 
-            <div class="bd-card"><h3>تقرير SLA حسب نوع الطلب</h3>
-                <table class="bd-table"><thead><tr><th>نوع الطلب</th><th>إجمالي المنجزة</th><th>Ontime</th><th>Out SLA</th><th>نسبة الالتزام</th></tr></thead><tbody id="slaTBody"></tbody></table>
+            <div class="bd"><h3>تقرير مستوى الخدمة (SLA) حسب نوع الطلب</h3>
+                <table class="bt"><thead><tr><th>نوع الطلب</th><th>إجمالي المنجزة</th><th>Ontime</th><th>Out SLA</th><th>نسبة الالتزام</th></tr></thead><tbody id="sTB"></tbody></table>
             </div>
         </div>
 
-        <!-- TAB: USER MANAGEMENT -->
-        <div class="tab-content" id="tabUsers">
-            <div class="um-header">
+        <!-- TAB: USERS -->
+        <div class="tc" id="tUsers">
+            <div class="umh">
                 <h3>إدارة المشرفين والمستخدمين</h3>
-                <button class="um-add-btn" onclick="openAddUser()">+ إضافة مستخدم جديد</button>
+                <button class="uma" onclick="openAdd()">+ إضافة مستخدم جديد</button>
             </div>
-            <table class="um-table">
+            <table class="ut">
                 <thead><tr><th>#</th><th>اسم المستخدم</th><th>الاسم</th><th>الصلاحية</th><th>الحالة</th><th>تاريخ الإنشاء</th><th>إجراءات</th></tr></thead>
-                <tbody id="usersTBody"></tbody>
+                <tbody id="uTB"></tbody>
             </table>
         </div>
     </div>
 </div>
 
 <!-- ADD USER MODAL -->
-<div class="modal-bg" id="addUserModal">
-    <div class="modal-box">
+<div class="mbg" id="addM">
+    <div class="mbox">
         <h3>إضافة مستخدم جديد</h3>
-        <div class="fg"><label>اسم المستخدم (للدخول)</label><input type="text" id="newUsername" placeholder="مثال: ahmed.hr" autocomplete="off"></div>
-        <div class="fg"><label>الاسم الظاهر</label><input type="text" id="newDisplayName" placeholder="مثال: أحمد محمد"></div>
-        <div class="fg"><label>كلمة المرور</label><input type="password" id="newPassword" placeholder="كلمة مرور قوية"></div>
-        <div class="fg"><label>الصلاحية</label>
-            <select id="newRole"><option value="supervisor">مشرف (Supervisor)</option><option value="admin">مدير نظام (Admin)</option></select>
-        </div>
-        <div class="modal-err" id="addUserErr"></div>
-        <div class="modal-btns">
-            <button class="mbtn-save" onclick="saveNewUser()">حفظ</button>
-            <button class="mbtn-cancel" onclick="closeAddUser()">إلغاء</button>
-        </div>
+        <div class="mfg"><label>اسم المستخدم (للدخول)</label><input type="text" id="nUser" placeholder="مثال: ahmed.hr" autocomplete="off"></div>
+        <div class="mfg"><label>الاسم الظاهر</label><input type="text" id="nName" placeholder="مثال: أحمد محمد"></div>
+        <div class="mfg"><label>كلمة المرور</label><input type="password" id="nPass" placeholder="6 أحرف على الأقل"></div>
+        <div class="mfg"><label>الصلاحية</label><select id="nRole"><option value="supervisor">مشرف (Supervisor)</option><option value="admin">مدير نظام (Admin)</option></select></div>
+        <div class="merr" id="addErr"></div>
+        <div class="mbtns"><button class="mb-s" onclick="saveUser()">حفظ</button><button class="mb-c" onclick="closeAdd()">إلغاء</button></div>
     </div>
 </div>
 
 <!-- RESET PASSWORD MODAL -->
-<div class="rp-modal" id="resetPwModal">
-    <div class="modal-box">
+<div class="mbg" id="rpM">
+    <div class="mbox">
         <h3>إعادة تعيين كلمة المرور</h3>
-        <p style="font-size:13px;color:var(--text-light);margin-bottom:14px;" id="rpUserLabel"></p>
-        <div class="fg"><label>كلمة المرور الجديدة</label><input type="password" id="rpNewPass" placeholder="كلمة مرور جديدة"></div>
-        <div class="modal-err" id="rpErr"></div>
-        <div class="modal-btns">
-            <button class="mbtn-save" onclick="doResetPw()">تحديث</button>
-            <button class="mbtn-cancel" onclick="closeResetPw()">إلغاء</button>
-        </div>
+        <p style="font-size:12px;color:var(--text-light);margin-bottom:12px" id="rpLabel"></p>
+        <div class="mfg"><label>كلمة المرور الجديدة</label><input type="password" id="rpPass" placeholder="6 أحرف على الأقل"></div>
+        <div class="merr" id="rpErr"></div>
+        <div class="mbtns"><button class="mb-s" onclick="doReset()">تحديث</button><button class="mb-c" onclick="closeRp()">إلغاء</button></div>
     </div>
 </div>
 
 <script>
-const SUPABASE_URL = 'https://vievkkhwwsdeecxazfqp.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpZXZra2h3d3NkZWVjeGF6ZnFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxNDY3MDAsImV4cCI6MjA5MDcyMjcwMH0.okIbSC-_GSeXcNgxTLlwZ2SVvJtMs14pVcFGq_nbJPQ';
-const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+// ========== SUPABASE ==========
+const SB_URL = 'https://vievkkhwwsdeecxazfqp.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpZXZra2h3d3NkZWVjeGF6ZnFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxNDY3MDAsImV4cCI6MjA5MDcyMjcwMH0.okIbSC-_GSeXcNgxTLlwZ2SVvJtMs14pVcFGq_nbJPQ';
+const db = window.supabase.createClient(SB_URL, SB_KEY);
 
-let currentUser=null;
-const DEPTS=['المبيعات','سلاسل الامداد','خدمة العملاء','التصنيع','دعم الاعمال','تكنولوجيا المعلومات','الحسابات','شركة الجملة'];
-const RNAMES={'1':'مفردات المرتب','2':'رصيد الاجازات','3':'سجل حضور/انصراف','4':'HR Letter','5':'شكوى','6':'ختم أوراق','7':'سلفة','8':'إبلاغ عن مخالفة'};
-let chartT=null,chartS=null;
+let CU = null;
+const DEPTS = ['المبيعات','سلاسل الامداد','خدمة العملاء','التصنيع','دعم الاعمال','تكنولوجيا المعلومات','الحسابات','شركة الجملة'];
+const RN = {'1':'مفردات المرتب','2':'رصيد الاجازات','3':'سجل حضور/انصراف','4':'HR Letter','5':'شكوى','6':'ختم أوراق','7':'سلفة','8':'إبلاغ عن مخالفة'};
+let chT = null, chS = null;
 
-// ======== LOGIN ========
-async function doLogin(){
-    const u=document.getElementById('loginUser').value.trim(),p=document.getElementById('loginPass').value;
-    if(!u||!p)return;
-    const{data,error}=await supabase.rpc('verify_password',{p_username:u,p_password:p});
-    if(error||!data||!data.length){document.getElementById('loginErr').classList.add('show');return;}
-    if(data[0].role!=='admin'){document.getElementById('loginErr').classList.add('show');return;}
-    currentUser=data[0];sessionStorage.setItem('hr_admin',JSON.stringify(data[0]));showDash();
-}
-function showDash(){document.getElementById('loginOverlay').classList.add('hidden');document.getElementById('dashboard').classList.add('show');loadDash();loadUsers();}
-function doLogout(){sessionStorage.removeItem('hr_admin');location.reload();}
-const sv=sessionStorage.getItem('hr_admin');if(sv){currentUser=JSON.parse(sv);showDash();}
-document.getElementById('loginPass').addEventListener('keyup',e=>{if(e.key==='Enter')doLogin();});
-
-// ======== TABS ========
-function switchTab(tab){
-    document.getElementById('tabDash').classList.toggle('active',tab==='dashboard');
-    document.getElementById('tabUsers').classList.toggle('active',tab==='users');
-    document.getElementById('tabDashBtn').classList.toggle('active-tab',tab==='dashboard');
-    document.getElementById('tabUsersBtn').classList.toggle('active-tab',tab==='users');
-    if(tab==='users')loadUsers();
-    if(tab==='dashboard')loadDash();
+// ========== LOGIN ==========
+async function doLogin() {
+    const u = document.getElementById('lUser').value.trim();
+    const p = document.getElementById('lPass').value;
+    if (!u || !p) return;
+    const { data, error } = await db.rpc('verify_password', { p_username: u, p_password: p });
+    if (error || !data || !data.length) { document.getElementById('lErr').classList.add('s'); return; }
+    if (data[0].role !== 'admin') { document.getElementById('lErr').classList.add('s'); return; }
+    CU = data[0];
+    sessionStorage.setItem('hr_adm', JSON.stringify(CU));
+    showDash();
 }
 
-// ======== DASHBOARD ========
-async function loadDash(){
-    const{data:reqs}=await supabase.from('hr_requests').select('*');
-    if(!reqs)return;
-    const total=reqs.length;
-    const pend=reqs.filter(r=>r.status==='لم يتم العمل عليه').length;
-    const prog=reqs.filter(r=>r.status==='قيد التنفيذ').length;
-    const done=reqs.filter(r=>r.status==='تم الانتهاء').length;
-    let ontime=0,outsla=0;
-    reqs.forEach(r=>{if(r.status==='تم الانتهاء'&&r.status_updated_at){const d=(new Date(r.status_updated_at)-new Date(r.submitted_at))/(36e5);d<=(r.sla_hours||24)?ontime++:outsla++;}});
-    const td=ontime+outsla;
-    document.getElementById('kTotal').textContent=total;
-    document.getElementById('kPend').textContent=pend;
-    document.getElementById('kProg').textContent=prog;
-    document.getElementById('kDone').textContent=done;
-    document.getElementById('kSLA').textContent=td?Math.round(ontime/td*100)+'%':'—';
-    document.getElementById('kSLASub').textContent=`${ontime} Ontime / ${outsla} Out of SLA`;
-    document.getElementById('kComp').textContent=total?Math.round(td/total*100)+'%':'—';
-    document.getElementById('kCompSub').textContent=`${td} منجزة من ${total}`;
+function showDash() {
+    document.getElementById('loginOv').classList.add('h');
+    document.getElementById('dashboard').classList.add('s');
+    loadDash();
+    loadUsers();
+}
 
-    // Charts
-    const tc={};for(let i=1;i<=8;i++)tc[i]=0;
-    reqs.forEach(r=>{tc[r.request_type]=(tc[r.request_type]||0)+1;});
-    if(chartT)chartT.destroy();
-    chartT=new Chart(document.getElementById('chartType'),{type:'bar',data:{labels:Object.keys(tc).map(k=>RNAMES[k]),datasets:[{data:Object.values(tc),backgroundColor:['#693C0F','#8B5E34','#D4A574','#4A2A0A','#A67C52','#C49A6C','#5D3A1A','#B8860B'],borderRadius:6,maxBarThickness:36}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1,font:{family:'Tajawal'}}},x:{ticks:{font:{family:'Tajawal',size:10},maxRotation:45}}}}});
+function doLogout() { sessionStorage.removeItem('hr_adm'); location.reload(); }
 
-    if(chartS)chartS.destroy();
-    chartS=new Chart(document.getElementById('chartStatus'),{type:'doughnut',data:{labels:['لم يتم العمل عليه','قيد التنفيذ','تم الانتهاء'],datasets:[{data:[pend,prog,done],backgroundColor:['#B71C1C','#1565C0','#2E7D32'],borderWidth:0,hoverOffset:8}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{family:'Tajawal',size:12},padding:14}}},cutout:'55%'}});
+const sv = sessionStorage.getItem('hr_adm');
+if (sv) { CU = JSON.parse(sv); showDash(); }
+document.getElementById('lPass').addEventListener('keyup', e => { if (e.key === 'Enter') doLogin(); });
 
-    // Dept breakdown
-    document.getElementById('deptTBody').innerHTML=DEPTS.map(dept=>{
-        const dr=reqs.filter(r=>r.department===dept);
-        const dp=dr.filter(r=>r.status==='لم يتم العمل عليه').length;
-        const di=dr.filter(r=>r.status==='قيد التنفيذ').length;
-        const dd=dr.filter(r=>r.status==='تم الانتهاء').length;
-        let don=0,dout=0;
-        dr.forEach(r=>{if(r.status==='تم الانتهاء'&&r.status_updated_at){const d=(new Date(r.status_updated_at)-new Date(r.submitted_at))/(36e5);d<=(r.sla_hours||24)?don++:dout++;}});
-        return`<tr><td style="font-weight:700;">${dept}</td><td>${dr.length}</td><td style="color:var(--error);font-weight:700;">${dp}</td><td style="color:var(--blue);font-weight:700;">${di}</td><td style="color:var(--success);font-weight:700;">${dd}</td><td><span class="tag-on">${don}</span></td><td><span class="tag-out">${dout}</span></td></tr>`;
+// ========== TABS ==========
+function swTab(t) {
+    document.getElementById('tDash').classList.toggle('a', t === 'dash');
+    document.getElementById('tUsers').classList.toggle('a', t === 'users');
+    document.getElementById('tDBtn').classList.toggle('at', t === 'dash');
+    document.getElementById('tUBtn').classList.toggle('at', t === 'users');
+    if (t === 'users') loadUsers();
+    if (t === 'dash') loadDash();
+}
+
+// ========== DASHBOARD ==========
+async function loadDash() {
+    const { data: reqs } = await db.from('hr_requests').select('*');
+    if (!reqs) return;
+    const total = reqs.length;
+    const pend = reqs.filter(r => r.status === 'لم يتم العمل عليه').length;
+    const prog = reqs.filter(r => r.status === 'قيد التنفيذ').length;
+    const done = reqs.filter(r => r.status === 'تم الانتهاء').length;
+
+    let ontime = 0, outsla = 0;
+    reqs.forEach(r => {
+        if (r.status === 'تم الانتهاء' && r.status_updated_at) {
+            const hrs = (new Date(r.status_updated_at) - new Date(r.submitted_at)) / 36e5;
+            hrs <= (r.sla_hours || 24) ? ontime++ : outsla++;
+        }
+    });
+    const td = ontime + outsla;
+
+    document.getElementById('kT').textContent = total;
+    document.getElementById('kP').textContent = pend;
+    document.getElementById('kI').textContent = prog;
+    document.getElementById('kD').textContent = done;
+    document.getElementById('kS').textContent = td ? Math.round(ontime / td * 100) + '%' : '—';
+    document.getElementById('kSs').textContent = `${ontime} Ontime / ${outsla} Out of SLA`;
+    document.getElementById('kC').textContent = total ? Math.round(td / total * 100) + '%' : '—';
+    document.getElementById('kCs').textContent = `${td} منجزة من ${total}`;
+
+    // Bar chart - request types
+    const tc = {};
+    for (let i = 1; i <= 8; i++) tc[i] = 0;
+    reqs.forEach(r => { tc[r.request_type] = (tc[r.request_type] || 0) + 1; });
+    if (chT) chT.destroy();
+    chT = new Chart(document.getElementById('chType'), {
+        type: 'bar',
+        data: {
+            labels: Object.keys(tc).map(k => RN[k]),
+            datasets: [{ data: Object.values(tc), backgroundColor: ['#693C0F','#8B5E34','#D4A574','#4A2A0A','#A67C52','#C49A6C','#5D3A1A','#B8860B'], borderRadius: 5, maxBarThickness: 34 }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: 'Tajawal' } } }, x: { ticks: { font: { family: 'Tajawal', size: 10 }, maxRotation: 45 } } } }
+    });
+
+    // Doughnut - status
+    if (chS) chS.destroy();
+    chS = new Chart(document.getElementById('chStat'), {
+        type: 'doughnut',
+        data: {
+            labels: ['لم يتم العمل عليه', 'قيد التنفيذ', 'تم الانتهاء'],
+            datasets: [{ data: [pend, prog, done], backgroundColor: ['#B71C1C','#1565C0','#2E7D32'], borderWidth: 0, hoverOffset: 8 }]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { font: { family: 'Tajawal', size: 11 }, padding: 12 } } }, cutout: '55%' }
+    });
+
+    // Department breakdown
+    document.getElementById('dTB').innerHTML = DEPTS.map(dept => {
+        const dr = reqs.filter(r => r.department === dept);
+        const dp = dr.filter(r => r.status === 'لم يتم العمل عليه').length;
+        const di = dr.filter(r => r.status === 'قيد التنفيذ').length;
+        const dd = dr.filter(r => r.status === 'تم الانتهاء').length;
+        let don = 0, dout = 0;
+        dr.forEach(r => { if (r.status === 'تم الانتهاء' && r.status_updated_at) { const h = (new Date(r.status_updated_at) - new Date(r.submitted_at)) / 36e5; h <= (r.sla_hours || 24) ? don++ : dout++; } });
+        return `<tr><td style="font-weight:700">${dept}</td><td>${dr.length}</td><td style="color:var(--err);font-weight:700">${dp}</td><td style="color:var(--blue);font-weight:700">${di}</td><td style="color:var(--ok);font-weight:700">${dd}</td><td><span class="tOn">${don}</span></td><td><span class="tOut">${dout}</span></td></tr>`;
     }).join('');
 
     // SLA by type
-    document.getElementById('slaTBody').innerHTML=Object.keys(RNAMES).map(k=>{
-        const tr=reqs.filter(r=>r.request_type===k&&r.status==='تم الانتهاء'&&r.status_updated_at);
-        let ton=0,tout=0;
-        tr.forEach(r=>{const d=(new Date(r.status_updated_at)-new Date(r.submitted_at))/(36e5);d<=(r.sla_hours||24)?ton++:tout++;});
-        const tt=ton+tout;const pct=tt?Math.round(ton/tt*100):0;
-        return`<tr><td style="font-weight:700;">${RNAMES[k]}</td><td>${tt}</td><td><span class="tag-on">${ton}</span></td><td><span class="tag-out">${tout}</span></td><td style="font-weight:700;color:${pct>=80?'var(--success)':pct>0?'var(--error)':'var(--text-light)'};">${tt?pct+'%':'—'}</td></tr>`;
+    document.getElementById('sTB').innerHTML = Object.keys(RN).map(k => {
+        const tr = reqs.filter(r => r.request_type === k && r.status === 'تم الانتهاء' && r.status_updated_at);
+        let ton = 0, tout = 0;
+        tr.forEach(r => { const h = (new Date(r.status_updated_at) - new Date(r.submitted_at)) / 36e5; h <= (r.sla_hours || 24) ? ton++ : tout++; });
+        const tt = ton + tout;
+        const pct = tt ? Math.round(ton / tt * 100) : 0;
+        return `<tr><td style="font-weight:700">${RN[k]}</td><td>${tt}</td><td><span class="tOn">${ton}</span></td><td><span class="tOut">${tout}</span></td><td style="font-weight:700;color:${pct >= 80 ? 'var(--ok)' : pct > 0 ? 'var(--err)' : 'var(--text-light)'}">${tt ? pct + '%' : '—'}</td></tr>`;
     }).join('');
 }
 
-// ======== USER MANAGEMENT ========
-async function loadUsers(){
-    const{data:users}=await supabase.from('hr_users').select('*').order('created_at',{ascending:true});
-    if(!users)return;
-    document.getElementById('usersTBody').innerHTML=users.map((u,i)=>{
-        const dt=new Date(u.created_at).toLocaleString('ar-EG',{year:'numeric',month:'2-digit',day:'2-digit'});
-        const rc=u.role==='admin'?'role-admin':'role-sup';
-        const rl=u.role==='admin'?'أدمن':'مشرف';
-        const ac=u.is_active?'active-y':'active-n';
-        const al=u.is_active?'نشط':'معطّل';
-        return`<tr>
-            <td>${i+1}</td>
-            <td style="font-weight:700;direction:ltr;">${u.username}</td>
+// ========== USER MANAGEMENT ==========
+async function loadUsers() {
+    const { data: users } = await db.from('hr_users').select('*').order('created_at', { ascending: true });
+    if (!users) return;
+    document.getElementById('uTB').innerHTML = users.map((u, i) => {
+        const dt = new Date(u.created_at).toLocaleString('ar-EG', { year: 'numeric', month: '2-digit', day: '2-digit' });
+        return `<tr>
+            <td>${i + 1}</td>
+            <td style="font-weight:700;direction:ltr">${u.username}</td>
             <td>${u.display_name}</td>
-            <td><span class="role-badge ${rc}">${rl}</span></td>
-            <td><span class="active-badge ${ac}">${al}</span></td>
-            <td style="font-size:12px;">${dt}</td>
+            <td><span class="rb ${u.role === 'admin' ? 'r-a' : 'r-s'}">${u.role === 'admin' ? 'أدمن' : 'مشرف'}</span></td>
+            <td><span class="ab ${u.is_active ? 'a-y' : 'a-n'}">${u.is_active ? 'نشط' : 'معطّل'}</span></td>
+            <td style="font-size:11px">${dt}</td>
             <td>
-                <button class="um-action um-toggle" onclick="toggleUser('${u.id}',${u.is_active})">${u.is_active?'تعطيل':'تفعيل'}</button>
-                <button class="um-action um-reset" onclick="openResetPw('${u.id}','${u.username}')">تغيير كلمة المرور</button>
-                ${u.role!=='admin'?`<button class="um-action um-del" onclick="deleteUser('${u.id}','${u.username}')">حذف</button>`:''}
+                <button class="uab uab-t" onclick="togUser('${u.id}',${u.is_active})">${u.is_active ? 'تعطيل' : 'تفعيل'}</button>
+                <button class="uab uab-r" onclick="openRp('${u.id}','${u.username}')">تغيير كلمة المرور</button>
+                ${u.role !== 'admin' ? `<button class="uab uab-d" onclick="delUser('${u.id}','${u.username}')">حذف</button>` : ''}
             </td>
         </tr>`;
     }).join('');
 }
 
 // Add user
-function openAddUser(){document.getElementById('addUserModal').classList.add('open');}
-function closeAddUser(){document.getElementById('addUserModal').classList.remove('open');['newUsername','newDisplayName','newPassword'].forEach(id=>document.getElementById(id).value='');document.getElementById('addUserErr').classList.remove('show');}
+function openAdd() { document.getElementById('addM').classList.add('o'); }
+function closeAdd() { document.getElementById('addM').classList.remove('o'); ['nUser','nName','nPass'].forEach(id => document.getElementById(id).value = ''); document.getElementById('addErr').classList.remove('s'); }
 
-async function saveNewUser(){
-    const u=document.getElementById('newUsername').value.trim();
-    const d=document.getElementById('newDisplayName').value.trim();
-    const p=document.getElementById('newPassword').value;
-    const r=document.getElementById('newRole').value;
-    const errEl=document.getElementById('addUserErr');
+async function saveUser() {
+    const u = document.getElementById('nUser').value.trim();
+    const n = document.getElementById('nName').value.trim();
+    const p = document.getElementById('nPass').value;
+    const r = document.getElementById('nRole').value;
+    const errEl = document.getElementById('addErr');
 
-    if(!u||!d||!p){errEl.textContent='برجاء ملء جميع الحقول';errEl.classList.add('show');return;}
-    if(p.length<6){errEl.textContent='كلمة المرور يجب أن تكون 6 أحرف على الأقل';errEl.classList.add('show');return;}
+    if (!u || !n || !p) { errEl.textContent = 'برجاء ملء جميع الحقول'; errEl.classList.add('s'); return; }
+    if (p.length < 6) { errEl.textContent = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل'; errEl.classList.add('s'); return; }
 
-    // Hash password using pgcrypto via RPC
-    const{data,error}=await supabase.rpc('create_hr_user',{p_username:u,p_password:p,p_display_name:d,p_role:r,p_created_by:currentUser.id});
+    const { error } = await db.rpc('create_hr_user', { p_username: u, p_password: p, p_display_name: n, p_role: r, p_created_by: CU.id });
 
-    if(error){
-        if(error.message.includes('duplicate')||error.message.includes('unique')){
-            errEl.textContent='اسم المستخدم موجود بالفعل';
-        } else {
-            errEl.textContent='حدث خطأ: '+error.message;
-        }
-        errEl.classList.add('show');return;
+    if (error) {
+        errEl.textContent = error.message.includes('duplicate') || error.message.includes('unique') ? 'اسم المستخدم موجود بالفعل' : 'خطأ: ' + error.message;
+        errEl.classList.add('s');
+        return;
     }
-
-    closeAddUser();loadUsers();
-}
-
-// Toggle active
-async function toggleUser(id,isActive){
-    if(!confirm(isActive?'هل تريد تعطيل هذا المستخدم؟':'هل تريد تفعيل هذا المستخدم؟'))return;
-    await supabase.from('hr_users').update({is_active:!isActive}).eq('id',id);
+    closeAdd();
     loadUsers();
 }
 
-// Delete user
-async function deleteUser(id,name){
-    if(!confirm(`هل أنت متأكد من حذف المستخدم "${name}"؟ هذا الإجراء لا يمكن التراجع عنه.`))return;
-    await supabase.from('hr_users').delete().eq('id',id);
+// Toggle active
+async function togUser(id, isActive) {
+    if (!confirm(isActive ? 'هل تريد تعطيل هذا المستخدم؟' : 'هل تريد تفعيل هذا المستخدم؟')) return;
+    await db.from('hr_users').update({ is_active: !isActive }).eq('id', id);
+    loadUsers();
+}
+
+// Delete
+async function delUser(id, name) {
+    if (!confirm(`هل أنت متأكد من حذف "${name}"؟ لا يمكن التراجع.`)) return;
+    await db.from('hr_users').delete().eq('id', id);
     loadUsers();
 }
 
 // Reset password
-let resetUserId=null;
-function openResetPw(id,name){resetUserId=id;document.getElementById('rpUserLabel').textContent=`المستخدم: ${name}`;document.getElementById('resetPwModal').classList.add('open');}
-function closeResetPw(){document.getElementById('resetPwModal').classList.remove('open');document.getElementById('rpNewPass').value='';document.getElementById('rpErr').classList.remove('show');resetUserId=null;}
+let rpId = null;
+function openRp(id, name) { rpId = id; document.getElementById('rpLabel').textContent = 'المستخدم: ' + name; document.getElementById('rpM').classList.add('o'); }
+function closeRp() { document.getElementById('rpM').classList.remove('o'); document.getElementById('rpPass').value = ''; document.getElementById('rpErr').classList.remove('s'); rpId = null; }
 
-async function doResetPw(){
-    const p=document.getElementById('rpNewPass').value;
-    if(!p||p.length<6){document.getElementById('rpErr').textContent='كلمة المرور يجب أن تكون 6 أحرف على الأقل';document.getElementById('rpErr').classList.add('show');return;}
-
-    const{error}=await supabase.rpc('reset_hr_password',{p_user_id:resetUserId,p_new_password:p});
-    if(error){document.getElementById('rpErr').textContent='خطأ: '+error.message;document.getElementById('rpErr').classList.add('show');return;}
-    closeResetPw();alert('تم تحديث كلمة المرور بنجاح');
+async function doReset() {
+    const p = document.getElementById('rpPass').value;
+    if (!p || p.length < 6) { document.getElementById('rpErr').textContent = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل'; document.getElementById('rpErr').classList.add('s'); return; }
+    const { error } = await db.rpc('reset_hr_password', { p_user_id: rpId, p_new_password: p });
+    if (error) { document.getElementById('rpErr').textContent = 'خطأ: ' + error.message; document.getElementById('rpErr').classList.add('s'); return; }
+    closeRp();
+    alert('تم تحديث كلمة المرور بنجاح');
 }
 
-setInterval(loadDash,30000);
+setInterval(loadDash, 30000);
 </script>
 </body>
 </html>

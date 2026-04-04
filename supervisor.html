@@ -7,176 +7,255 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root {
-            --primary:#693C0F;--primary-light:#8B5E34;--primary-dark:#4A2A0A;
-            --accent:#D4A574;--accent-light:#F0DCC8;--accent-pale:#FAF4ED;
-            --bg:#F7F4F0;--card-bg:#FFFFFF;--text:#2C2218;--text-mid:#5C4A3A;--text-light:#8C7B6B;
-            --border:#E8DFD4;--border-light:#F2ECE4;
-            --success:#2E7D32;--success-bg:#E8F5E9;--error:#B71C1C;--error-bg:#FFEBEE;
-            --blue:#1565C0;--blue-bg:#E3F2FD;
-            --shadow-md:0 4px 16px rgba(74,42,10,0.08);--radius:12px;
-        }
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+        :root{--primary:#693C0F;--primary-light:#8B5E34;--primary-dark:#4A2A0A;--accent:#D4A574;--accent-light:#F0DCC8;--accent-pale:#FAF4ED;--bg:#F7F4F0;--card:#FFFFFF;--text:#2C2218;--text-mid:#5C4A3A;--text-light:#8C7B6B;--border:#E8DFD4;--border-lt:#F2ECE4;--ok:#2E7D32;--ok-bg:#E8F5E9;--err:#B71C1C;--err-bg:#FFEBEE;--blue:#1565C0;--blue-bg:#E3F2FD;--shadow:0 4px 16px rgba(74,42,10,.07)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 
-        .login-overlay{position:fixed;inset:0;background:linear-gradient(160deg,var(--primary-dark),var(--primary),var(--primary-light));display:flex;align-items:center;justify-content:center;z-index:9999;}
-        .login-overlay.hidden{display:none;}
-        .login-box{background:#fff;border-radius:20px;padding:40px 30px;width:90%;max-width:380px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
-        .login-logo{width:70px;height:70px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-family:'Amiri',serif;font-size:28px;color:var(--accent);font-weight:700;}
-        .login-box h2{font-size:19px;color:var(--primary-dark);margin-bottom:4px;}
-        .login-box p{font-size:13px;color:var(--text-light);margin-bottom:22px;}
-        .login-box input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:14px;margin-bottom:10px;outline:none;text-align:right;}
-        .login-box input:focus{border-color:var(--primary);}
-        .login-btn{width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-family:'Tajawal',sans-serif;font-size:15px;font-weight:700;cursor:pointer;}
-        .login-btn:hover{background:var(--primary-dark);}
-        .login-err{color:var(--error);font-size:12px;margin-top:8px;display:none;}
-        .login-err.show{display:block;}
+        /* LOGIN */
+        .lo{position:fixed;inset:0;background:linear-gradient(160deg,var(--primary-dark),var(--primary),var(--primary-light));display:flex;align-items:center;justify-content:center;z-index:9999}
+        .lo.h{display:none}
+        .lb{background:#fff;border-radius:20px;padding:38px 28px;width:90%;max-width:370px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+        .ll{width:68px;height:68px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-family:'Amiri',serif;font-size:28px;color:var(--accent);font-weight:700}
+        .lb h2{font-size:18px;color:var(--primary-dark);margin-bottom:3px}
+        .lb .sp{font-size:12px;color:var(--text-light);margin-bottom:20px}
+        .lb input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:14px;margin-bottom:10px;outline:none;text-align:right}
+        .lb input:focus{border-color:var(--primary)}
+        .lbn{width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-family:'Tajawal',sans-serif;font-size:15px;font-weight:700;cursor:pointer}
+        .lbn:hover{background:var(--primary-dark)}
+        .le{color:var(--err);font-size:12px;margin-top:8px;display:none}.le.s{display:block}
 
-        .main-page{display:none;}.main-page.show{display:block;}
-        .header{background:var(--primary-dark);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;}
-        .header-right h1{color:#fff;font-size:20px;font-weight:800;}
-        .header-right p{color:rgba(255,255,255,0.55);font-size:12px;}
-        .header-left{display:flex;align-items:center;gap:12px;}
-        .user-badge{background:rgba(255,255,255,0.1);color:var(--accent);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;}
-        .logout-btn{background:rgba(255,255,255,0.1);color:#fff;border:none;padding:7px 16px;border-radius:8px;font-family:'Tajawal',sans-serif;font-size:12px;cursor:pointer;}
-        .logout-btn:hover{background:rgba(255,255,255,0.2);}
-        .accent-bar{height:3px;background:linear-gradient(to right,var(--accent),var(--primary-light),var(--accent));opacity:0.4;}
+        /* MAIN */
+        .mp{display:none}.mp.s{display:block}
+        .hdr{background:var(--primary-dark);padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+        .hdr h1{color:#fff;font-size:19px;font-weight:800}
+        .hdr .hp{color:rgba(255,255,255,.5);font-size:11px}
+        .hdr-l{display:flex;align-items:center;gap:10px}
+        .ub{background:rgba(255,255,255,.1);color:var(--accent);padding:5px 14px;border-radius:18px;font-size:12px;font-weight:600}
+        .lout{background:rgba(255,255,255,.1);color:#fff;border:none;padding:6px 14px;border-radius:8px;font-family:'Tajawal',sans-serif;font-size:12px;cursor:pointer}
+        .lout:hover{background:rgba(255,255,255,.2)}
+        .abar{height:3px;background:linear-gradient(to right,var(--accent),var(--primary-light),var(--accent));opacity:.35}
 
-        .toolbar{background:var(--card-bg);padding:14px 20px;border-bottom:1px solid var(--border);display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
-        .toolbar select,.toolbar input[type="text"]{padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Tajawal',sans-serif;font-size:12px;background:var(--accent-pale);outline:none;}
-        .toolbar select:focus,.toolbar input:focus{border-color:var(--primary);}
-        .tool-btn{padding:8px 18px;border:none;border-radius:8px;font-family:'Tajawal',sans-serif;font-size:12px;font-weight:700;cursor:pointer;}
-        .btn-refresh{background:var(--primary);color:#fff;}.btn-refresh:hover{background:var(--primary-dark);}
-        .btn-export{background:var(--success);color:#fff;margin-right:auto;}.btn-export:hover{background:#1B5E20;}
+        /* TOOLBAR */
+        .tb{background:var(--card);padding:12px 18px;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+        .tb select,.tb input[type="text"]{padding:7px 11px;border:1.5px solid var(--border);border-radius:7px;font-family:'Tajawal',sans-serif;font-size:12px;background:var(--accent-pale);outline:none}
+        .tb select:focus,.tb input:focus{border-color:var(--primary)}
+        .tbtn{padding:7px 16px;border:none;border-radius:7px;font-family:'Tajawal',sans-serif;font-size:12px;font-weight:700;cursor:pointer}
+        .tbtn-r{background:var(--primary);color:#fff}.tbtn-r:hover{background:var(--primary-dark)}
+        .tbtn-e{background:var(--ok);color:#fff;margin-right:auto}.tbtn-e:hover{background:#1B5E20}
 
-        .table-wrap{padding:16px;overflow-x:auto;}
-        table{width:100%;min-width:1500px;border-collapse:separate;border-spacing:0;background:var(--card-bg);border-radius:12px;overflow:hidden;box-shadow:var(--shadow-md);}
-        thead{background:var(--primary-dark);}
-        thead th{color:#fff;font-size:11.5px;font-weight:700;padding:13px 10px;text-align:right;white-space:nowrap;}
-        thead th.ec{background:var(--primary-light);}
-        tbody tr{border-bottom:1px solid var(--border-light);transition:0.15s;}
-        tbody tr:hover{background:rgba(105,60,15,0.02);}
-        tbody td{padding:10px;font-size:12.5px;vertical-align:top;border-bottom:1px solid #f0ebe5;}
-        .td-ro{background:#FDFBF8;}.td-ed{background:#FFFCF5;}
+        /* TABLE */
+        .tw{padding:14px;overflow-x:auto}
+        table{width:100%;min-width:1550px;border-collapse:separate;border-spacing:0;background:var(--card);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+        thead{background:var(--primary-dark)}
+        thead th{color:#fff;font-size:11px;font-weight:700;padding:12px 9px;text-align:right;white-space:nowrap}
+        thead th.ec{background:var(--primary-light)}
+        tbody tr{transition:.15s}tbody tr:hover{background:rgba(105,60,15,.02)}
+        tbody td{padding:9px;font-size:12px;vertical-align:top;border-bottom:1px solid #f0ebe5}
+        .ro{background:#FDFBF8}.ed{background:#FFFCF5}
 
-        .status-sel{padding:6px 8px;border-radius:6px;border:1.5px solid var(--border);font-family:'Tajawal',sans-serif;font-size:11.5px;font-weight:700;cursor:pointer;outline:none;width:100%;min-width:130px;}
-        .st-p{background:var(--error-bg);color:var(--error);border-color:#EF9A9A;}
-        .st-i{background:var(--blue-bg);color:var(--blue);border-color:#90CAF9;}
-        .st-d{background:var(--success-bg);color:var(--success);border-color:#A5D6A7;}
+        .ss{padding:5px 7px;border-radius:6px;border:1.5px solid var(--border);font-family:'Tajawal',sans-serif;font-size:11px;font-weight:700;cursor:pointer;outline:none;width:100%;min-width:125px}
+        .sP{background:var(--err-bg);color:var(--err);border-color:#EF9A9A}
+        .sI{background:var(--blue-bg);color:var(--blue);border-color:#90CAF9}
+        .sD{background:var(--ok-bg);color:var(--ok);border-color:#A5D6A7}
 
-        .fb-input{width:100%;min-width:170px;padding:7px 10px;border:1.5px solid var(--accent);border-radius:6px;font-family:'Tajawal',sans-serif;font-size:12px;resize:vertical;min-height:48px;outline:none;background:#fff;}
-        .fb-input:focus{border-color:var(--primary);box-shadow:0 0 0 2px rgba(105,60,15,0.07);}
+        .fi{width:100%;min-width:160px;padding:6px 9px;border:1.5px solid var(--accent);border-radius:6px;font-family:'Tajawal',sans-serif;font-size:11.5px;resize:vertical;min-height:44px;outline:none;background:#fff}
+        .fi:focus{border-color:var(--primary);box-shadow:0 0 0 2px rgba(105,60,15,.06)}
 
-        .sla-tag{padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;white-space:nowrap;}
-        .sla-on{background:var(--success-bg);color:var(--success);}
-        .sla-out{background:var(--error-bg);color:var(--error);}
-        .sla-na{background:#F5F5F5;color:#999;}
+        .st{padding:3px 7px;border-radius:4px;font-size:10.5px;font-weight:700;white-space:nowrap}
+        .sOn{background:var(--ok-bg);color:var(--ok)}
+        .sOut{background:var(--err-bg);color:var(--err)}
+        .sNA{background:#F5F5F5;color:#999}
 
-        .empty-msg{text-align:center;padding:50px 20px;color:var(--text-light);font-size:15px;}
-        .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--success);color:#fff;padding:10px 24px;border-radius:10px;font-weight:700;font-size:13px;box-shadow:0 4px 20px rgba(0,0,0,0.2);transition:transform 0.3s;z-index:999;}
-        .toast.pop{transform:translateX(-50%) translateY(0);}
+        .em{text-align:center;padding:45px 20px;color:var(--text-light);font-size:15px}
+        .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ok);color:#fff;padding:9px 22px;border-radius:10px;font-weight:700;font-size:13px;box-shadow:0 4px 20px rgba(0,0,0,.2);transition:transform .3s;z-index:999}
+        .toast.pop{transform:translateX(-50%) translateY(0)}
 
-        @media(max-width:768px){.toolbar{flex-direction:column;}.btn-export{margin-right:0;width:100%;}.header{flex-direction:column;gap:10px;text-align:center;}.header-left{justify-content:center;}}
+        @media(max-width:768px){.tb{flex-direction:column}.tbtn-e{margin-right:0;width:100%}.hdr{flex-direction:column;gap:8px;text-align:center}.hdr-l{justify-content:center}}
     </style>
 </head>
 <body>
 
-<div class="login-overlay" id="loginOverlay">
-    <div class="login-box">
-        <div class="login-logo">ن</div>
+<!-- LOGIN -->
+<div class="lo" id="loginOv">
+    <div class="lb">
+        <div class="ll">ن</div>
         <h2>لوحة المشرف</h2>
-        <p>نجيب سليم — إدارة الموارد البشرية</p>
-        <input type="text" id="loginUser" placeholder="اسم المستخدم" autocomplete="off">
-        <input type="password" id="loginPass" placeholder="كلمة المرور">
-        <button class="login-btn" onclick="doLogin()">تسجيل الدخول</button>
-        <div class="login-err" id="loginErr">اسم المستخدم أو كلمة المرور غير صحيحة</div>
+        <p class="sp">نجيب سليم — إدارة طلبات الموارد البشرية</p>
+        <input type="text" id="lUser" placeholder="اسم المستخدم" autocomplete="off">
+        <input type="password" id="lPass" placeholder="كلمة المرور">
+        <button class="lbn" onclick="doLogin()">تسجيل الدخول</button>
+        <div class="le" id="lErr">اسم المستخدم أو كلمة المرور غير صحيحة</div>
     </div>
 </div>
 
-<div class="main-page" id="mainPage">
-    <div class="header">
-        <div class="header-right"><h1>لوحة المشرف — طلبات HR</h1><p>عرض ومعالجة الطلبات</p></div>
-        <div class="header-left">
-            <div class="user-badge" id="userBadge">—</div>
-            <button class="logout-btn" onclick="doLogout()">خروج</button>
-        </div>
+<!-- MAIN -->
+<div class="mp" id="mainP">
+    <div class="hdr">
+        <div><h1>لوحة المشرف — طلبات HR</h1><p class="hp">عرض ومعالجة طلبات الموارد البشرية</p></div>
+        <div class="hdr-l"><div class="ub" id="uBadge">—</div><button class="lout" onclick="doLogout()">خروج</button></div>
     </div>
-    <div class="accent-bar"></div>
+    <div class="abar"></div>
 
-    <div class="toolbar">
-        <select id="fDept" onchange="loadTable()"><option value="">كل الإدارات</option><option value="المبيعات">المبيعات</option><option value="سلاسل الامداد">سلاسل الامداد</option><option value="خدمة العملاء">خدمة العملاء</option><option value="التصنيع">التصنيع</option><option value="دعم الاعمال">دعم الاعمال</option><option value="تكنولوجيا المعلومات">تكنولوجيا المعلومات</option><option value="الحسابات">الحسابات</option><option value="شركة الجملة">شركة الجملة</option></select>
-        <select id="fStatus" onchange="loadTable()"><option value="">كل الحالات</option><option value="لم يتم العمل عليه">لم يتم العمل عليه</option><option value="قيد التنفيذ">قيد التنفيذ</option><option value="تم الانتهاء">تم الانتهاء</option></select>
-        <select id="fType" onchange="loadTable()"><option value="">كل الأنواع</option><option value="1">مفردات المرتب</option><option value="2">رصيد اجازات</option><option value="3">سجل حضور</option><option value="4">HR Letter</option><option value="5">شكوى</option><option value="6">ختم أوراق</option><option value="7">سلفة</option><option value="8">إبلاغ مخالفة</option></select>
-        <input type="text" id="fSearch" placeholder="بحث برقم الطلب..." oninput="loadTable()">
-        <button class="tool-btn btn-refresh" onclick="loadTable()">🔄 تحديث</button>
-        <button class="tool-btn btn-export" onclick="exportCSV()">📥 تصدير Excel</button>
+    <div class="tb">
+        <select id="fD" onchange="load()"><option value="">كل الإدارات</option><option value="المبيعات">المبيعات</option><option value="سلاسل الامداد">سلاسل الامداد</option><option value="خدمة العملاء">خدمة العملاء</option><option value="التصنيع">التصنيع</option><option value="دعم الاعمال">دعم الاعمال</option><option value="تكنولوجيا المعلومات">تكنولوجيا المعلومات</option><option value="الحسابات">الحسابات</option><option value="شركة الجملة">شركة الجملة</option></select>
+        <select id="fS" onchange="load()"><option value="">كل الحالات</option><option value="لم يتم العمل عليه">لم يتم العمل عليه</option><option value="قيد التنفيذ">قيد التنفيذ</option><option value="تم الانتهاء">تم الانتهاء</option></select>
+        <select id="fT" onchange="load()"><option value="">كل الأنواع</option><option value="1">مفردات المرتب</option><option value="2">رصيد اجازات</option><option value="3">سجل حضور</option><option value="4">HR Letter</option><option value="5">شكوى</option><option value="6">ختم أوراق</option><option value="7">سلفة</option><option value="8">إبلاغ مخالفة</option></select>
+        <input type="text" id="fQ" placeholder="بحث برقم الطلب..." oninput="load()">
+        <button class="tbtn tbtn-r" onclick="load()">🔄 تحديث</button>
+        <button class="tbtn tbtn-e" onclick="expCSV()">📥 تصدير Excel</button>
     </div>
 
-    <div class="table-wrap">
+    <div class="tw">
         <table><thead><tr>
-            <th>#</th><th>رقم الطلب</th><th>الرقم الوظيفي</th><th>الهاتف</th><th>الإدارة</th><th>نوع الطلب</th><th>تفاصيل</th><th>تعليق</th><th>تاريخ الإرسال</th><th>SLA</th><th>Ontime/SLA</th><th class="ec">HR Feedback ✏️</th><th class="ec">حالة الطلب ✏️</th>
-        </tr></thead><tbody id="tBody"></tbody></table>
-        <div class="empty-msg" id="emptyMsg" style="display:none;">لا توجد طلبات حالياً</div>
+            <th>#</th><th>رقم الطلب</th><th>الرقم الوظيفي</th><th>الهاتف</th><th>الإدارة</th>
+            <th>نوع الطلب</th><th>تفاصيل فرعية</th><th>تعليق</th><th>تاريخ الإرسال</th>
+            <th>SLA</th><th>Ontime / Out SLA</th>
+            <th class="ec">HR Feedback ✏️</th><th class="ec">حالة الطلب ✏️</th>
+        </tr></thead><tbody id="tB"></tbody></table>
+        <div class="em" id="emMsg" style="display:none">لا توجد طلبات حالياً</div>
     </div>
 </div>
+
 <div class="toast" id="toast">✅ تم الحفظ</div>
 
 <script>
-const SUPABASE_URL = 'https://vievkkhwwsdeecxazfqp.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpZXZra2h3d3NkZWVjeGF6ZnFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxNDY3MDAsImV4cCI6MjA5MDcyMjcwMH0.okIbSC-_GSeXcNgxTLlwZ2SVvJtMs14pVcFGq_nbJPQ';
-const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let currentUser=null,allRequests=[];
+// ========== SUPABASE ==========
+const SB_URL = 'https://vievkkhwwsdeecxazfqp.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpZXZra2h3d3NkZWVjeGF6ZnFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxNDY3MDAsImV4cCI6MjA5MDcyMjcwMH0.okIbSC-_GSeXcNgxTLlwZ2SVvJtMs14pVcFGq_nbJPQ';
+const db = window.supabase.createClient(SB_URL, SB_KEY);
 
-async function doLogin(){
-    const u=document.getElementById('loginUser').value.trim(),p=document.getElementById('loginPass').value;
-    if(!u||!p)return;
-    const{data,error}=await supabase.rpc('verify_password',{p_username:u,p_password:p});
-    if(error||!data||!data.length){document.getElementById('loginErr').classList.add('show');return;}
-    const user=data[0];
-    if(user.role!=='supervisor'&&user.role!=='admin'){document.getElementById('loginErr').classList.add('show');return;}
-    currentUser=user;sessionStorage.setItem('hr_sup',JSON.stringify(user));showMain();
+let CU = null, ALL = [];
+
+// ========== LOGIN ==========
+async function doLogin() {
+    const u = document.getElementById('lUser').value.trim();
+    const p = document.getElementById('lPass').value;
+    if (!u || !p) return;
+    const { data, error } = await db.rpc('verify_password', { p_username: u, p_password: p });
+    if (error || !data || !data.length) { document.getElementById('lErr').classList.add('s'); return; }
+    const user = data[0];
+    if (user.role !== 'supervisor' && user.role !== 'admin') { document.getElementById('lErr').classList.add('s'); return; }
+    CU = user;
+    sessionStorage.setItem('hr_sup', JSON.stringify(user));
+    showMain();
 }
-function showMain(){document.getElementById('loginOverlay').classList.add('hidden');document.getElementById('mainPage').classList.add('show');document.getElementById('userBadge').textContent=currentUser.display_name;loadTable();}
-function doLogout(){sessionStorage.removeItem('hr_sup');currentUser=null;location.reload();}
-const sv=sessionStorage.getItem('hr_sup');if(sv){currentUser=JSON.parse(sv);showMain();}
-document.getElementById('loginPass').addEventListener('keyup',e=>{if(e.key==='Enter')doLogin();});
 
-async function loadTable(){
-    let q=supabase.from('hr_requests').select('*').order('submitted_at',{ascending:false});
-    const d=document.getElementById('fDept').value,s=document.getElementById('fStatus').value,t=document.getElementById('fType').value,sr=document.getElementById('fSearch').value.trim().toLowerCase();
-    if(d)q=q.eq('department',d);if(s)q=q.eq('status',s);if(t)q=q.eq('request_type',t);if(sr)q=q.ilike('ticket',`%${sr}%`);
-    const{data,error}=await q;if(error){console.error(error);return;}
-    allRequests=data||[];renderRows(allRequests);
+function showMain() {
+    document.getElementById('loginOv').classList.add('h');
+    document.getElementById('mainP').classList.add('s');
+    document.getElementById('uBadge').textContent = CU.display_name;
+    load();
 }
-function ext(r){if(r.request_type==='4')return'الجهة: '+(r.hr_letter_dest||'—');if(r.request_type==='5')return'سبب: '+(r.complaint_reason||'—');if(r.request_type==='8')return'نوع: '+(r.violation_reason||'—');return'—';}
-function slaC(r){if(r.status!=='تم الانتهاء'||!r.status_updated_at)return'—';const d=(new Date(r.status_updated_at)-new Date(r.submitted_at))/(1e3*60*60);return d<=(r.sla_hours||24)?'Ontime':'Out of SLA';}
-function stC(s){return s==='لم يتم العمل عليه'?'st-p':s==='قيد التنفيذ'?'st-i':'st-d';}
 
-function renderRows(rows){
-    const tb=document.getElementById('tBody'),em=document.getElementById('emptyMsg');
-    if(!rows.length){tb.innerHTML='';em.style.display='block';return;}em.style.display='none';
-    tb.innerHTML=rows.map((r,i)=>{
-        const sla=slaC(r),slaCl=sla==='Ontime'?'sla-on':sla==='Out of SLA'?'sla-out':'sla-na';
-        const dt=new Date(r.submitted_at).toLocaleString('ar-EG',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
-        return`<tr><td class="td-ro">${i+1}</td><td class="td-ro" style="font-weight:700;direction:ltr;text-align:center;font-size:11px;">${r.ticket}</td><td class="td-ro" style="text-align:center;">${r.emp_id}</td><td class="td-ro" style="direction:ltr;text-align:center;">${r.phone}</td><td class="td-ro">${r.department}</td><td class="td-ro">${r.request_name}</td><td class="td-ro">${ext(r)}</td><td class="td-ro" style="max-width:160px;">${r.comment||'—'}</td><td class="td-ro" style="white-space:nowrap;font-size:11px;">${dt}</td><td class="td-ro" style="font-size:11px;">${r.sla_text}</td><td class="td-ro"><span class="sla-tag ${slaCl}">${sla}</span></td><td class="td-ed"><textarea class="fb-input" data-id="${r.id}" onchange="saveFB(this)">${r.hr_feedback||''}</textarea></td><td class="td-ed"><select class="status-sel ${stC(r.status)}" data-id="${r.id}" onchange="saveST(this)"><option value="لم يتم العمل عليه" ${r.status==='لم يتم العمل عليه'?'selected':''}>لم يتم العمل عليه</option><option value="قيد التنفيذ" ${r.status==='قيد التنفيذ'?'selected':''}>قيد التنفيذ</option><option value="تم الانتهاء" ${r.status==='تم الانتهاء'?'selected':''}>تم الانتهاء</option></select></td></tr>`;
+function doLogout() { sessionStorage.removeItem('hr_sup'); CU = null; location.reload(); }
+
+// Auto-session
+const sv = sessionStorage.getItem('hr_sup');
+if (sv) { CU = JSON.parse(sv); showMain(); }
+document.getElementById('lPass').addEventListener('keyup', e => { if (e.key === 'Enter') doLogin(); });
+
+// ========== LOAD TABLE ==========
+async function load() {
+    let q = db.from('hr_requests').select('*').order('submitted_at', { ascending: false });
+    const fd = document.getElementById('fD').value;
+    const fs = document.getElementById('fS').value;
+    const ft = document.getElementById('fT').value;
+    const fq = document.getElementById('fQ').value.trim().toLowerCase();
+    if (fd) q = q.eq('department', fd);
+    if (fs) q = q.eq('status', fs);
+    if (ft) q = q.eq('request_type', ft);
+    if (fq) q = q.ilike('ticket', `%${fq}%`);
+    const { data } = await q;
+    ALL = data || [];
+    render(ALL);
+}
+
+function subDetail(r) {
+    if (r.request_type === '4' && r.hr_letter_dest) return 'الجهة: ' + r.hr_letter_dest;
+    if (r.request_type === '5' && r.complaint_reason) return 'سبب الشكوى: ' + r.complaint_reason;
+    if (r.request_type === '8' && r.violation_reason) return 'نوع المخالفة: ' + r.violation_reason;
+    return '—';
+}
+
+function slaCheck(r) {
+    if (r.status !== 'تم الانتهاء' || !r.status_updated_at) return '—';
+    const hrs = (new Date(r.status_updated_at) - new Date(r.submitted_at)) / 36e5;
+    return hrs <= (r.sla_hours || 24) ? 'Ontime' : 'Out of SLA';
+}
+
+function stCls(s) { return s === 'لم يتم العمل عليه' ? 'sP' : s === 'قيد التنفيذ' ? 'sI' : 'sD'; }
+
+function render(rows) {
+    const tb = document.getElementById('tB');
+    const em = document.getElementById('emMsg');
+    if (!rows.length) { tb.innerHTML = ''; em.style.display = 'block'; return; }
+    em.style.display = 'none';
+    tb.innerHTML = rows.map((r, i) => {
+        const sla = slaCheck(r);
+        const slC = sla === 'Ontime' ? 'sOn' : sla === 'Out of SLA' ? 'sOut' : 'sNA';
+        const dt = new Date(r.submitted_at).toLocaleString('ar-EG', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+        return `<tr>
+            <td class="ro">${i+1}</td>
+            <td class="ro" style="font-weight:700;direction:ltr;text-align:center;font-size:10.5px">${r.ticket}</td>
+            <td class="ro" style="text-align:center">${r.emp_id}</td>
+            <td class="ro" style="direction:ltr;text-align:center">${r.phone}</td>
+            <td class="ro">${r.department}</td>
+            <td class="ro">${r.request_name}</td>
+            <td class="ro">${subDetail(r)}</td>
+            <td class="ro" style="max-width:150px">${r.comment || '—'}</td>
+            <td class="ro" style="white-space:nowrap;font-size:10.5px">${dt}</td>
+            <td class="ro" style="font-size:10.5px">${r.sla_text}</td>
+            <td class="ro"><span class="st ${slC}">${sla}</span></td>
+            <td class="ed"><textarea class="fi" data-id="${r.id}" onchange="saveFB(this)">${r.hr_feedback || ''}</textarea></td>
+            <td class="ed"><select class="ss ${stCls(r.status)}" data-id="${r.id}" onchange="saveST(this)">
+                <option value="لم يتم العمل عليه" ${r.status==='لم يتم العمل عليه'?'selected':''}>لم يتم العمل عليه</option>
+                <option value="قيد التنفيذ" ${r.status==='قيد التنفيذ'?'selected':''}>قيد التنفيذ</option>
+                <option value="تم الانتهاء" ${r.status==='تم الانتهاء'?'selected':''}>تم الانتهاء</option>
+            </select></td>
+        </tr>`;
     }).join('');
 }
 
-async function saveFB(el){await supabase.from('hr_requests').update({hr_feedback:el.value,updated_by:currentUser?.id||null}).eq('id',el.dataset.id);toast();}
-async function saveST(el){
-    const u={status:el.value,updated_by:currentUser?.id||null};
-    if(el.value==='تم الانتهاء')u.status_updated_at=new Date().toISOString();else u.status_updated_at=null;
-    await supabase.from('hr_requests').update(u).eq('id',el.dataset.id);
-    el.className='status-sel '+stC(el.value);toast();setTimeout(loadTable,500);
+// ========== SAVE ==========
+async function saveFB(el) {
+    await db.from('hr_requests').update({ hr_feedback: el.value, updated_by: CU?.id || null }).eq('id', el.dataset.id);
+    showToast();
 }
-function toast(){const t=document.getElementById('toast');t.classList.add('pop');setTimeout(()=>t.classList.remove('pop'),2000);}
-function exportCSV(){
-    if(!allRequests.length){alert('لا توجد بيانات');return;}
-    let c='\uFEFF'+'رقم الطلب,الرقم الوظيفي,الهاتف,الإدارة,نوع الطلب,تفاصيل,تعليق,تاريخ الإرسال,SLA,الحالة,HR Feedback,تاريخ التحديث,Ontime/SLA\n';
-    allRequests.forEach(r=>{const sla=slaC(r),dt=new Date(r.submitted_at).toLocaleString('ar-EG'),udt=r.status_updated_at?new Date(r.status_updated_at).toLocaleString('ar-EG'):'';c+=`${r.ticket},${r.emp_id},${r.phone},${r.department},${r.request_name},"${ext(r)}","${r.comment||''}",${dt},${r.sla_text},${r.status},"${r.hr_feedback||''}",${udt},${sla}\n`;});
-    const b=new Blob([c],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`HR_Requests_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+
+async function saveST(el) {
+    const u = { status: el.value, updated_by: CU?.id || null };
+    if (el.value === 'تم الانتهاء') u.status_updated_at = new Date().toISOString();
+    else u.status_updated_at = null;
+    await db.from('hr_requests').update(u).eq('id', el.dataset.id);
+    el.className = 'ss ' + stCls(el.value);
+    showToast();
+    setTimeout(load, 500);
 }
-setInterval(loadTable,30000);
+
+function showToast() {
+    const t = document.getElementById('toast');
+    t.classList.add('pop');
+    setTimeout(() => t.classList.remove('pop'), 2000);
+}
+
+// ========== EXPORT ==========
+function expCSV() {
+    if (!ALL.length) { alert('لا توجد بيانات'); return; }
+    let c = '\uFEFF' + 'رقم الطلب,الرقم الوظيفي,الهاتف,الإدارة,نوع الطلب,تفاصيل فرعية,تعليق,تاريخ الإرسال,SLA,الحالة,HR Feedback,تاريخ التحديث,Ontime/SLA\n';
+    ALL.forEach(r => {
+        const sla = slaCheck(r);
+        const dt = new Date(r.submitted_at).toLocaleString('ar-EG');
+        const udt = r.status_updated_at ? new Date(r.status_updated_at).toLocaleString('ar-EG') : '';
+        c += `${r.ticket},${r.emp_id},${r.phone},${r.department},${r.request_name},"${subDetail(r)}","${r.comment||''}",${dt},${r.sla_text},${r.status},"${r.hr_feedback||''}",${udt},${sla}\n`;
+    });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([c], { type: 'text/csv;charset=utf-8;' }));
+    a.download = `HR_Requests_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+}
+
+// Auto-refresh
+setInterval(load, 30000);
 </script>
 </body>
 </html>
