@@ -45,7 +45,7 @@
 
         /* TABLE */
         .tw{padding:14px;overflow-x:auto}
-        table{width:100%;min-width:1550px;border-collapse:separate;border-spacing:0;background:var(--card);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+        table{width:100%;min-width:1650px;border-collapse:separate;border-spacing:0;background:var(--card);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
         thead{background:var(--primary-dark)}
         thead th{color:#fff;font-size:11px;font-weight:700;padding:12px 9px;text-align:right;white-space:nowrap}
         thead th.ec{background:var(--primary-light)}
@@ -115,7 +115,7 @@
         <table><thead><tr>
             <th>#</th><th>رقم الطلب</th><th>الرقم الوظيفي</th><th>الهاتف</th><th>الإدارة</th>
             <th>نوع الطلب</th><th>تفاصيل فرعية</th><th>تعليق</th><th>تاريخ الإرسال</th>
-            <th>SLA</th><th>Ontime / Out SLA</th>
+            <th>SLA</th><th>Ontime / Out SLA</th><th>تم التنفيذ بواسطة</th>
             <th class="ec">HR Feedback ✏️</th><th class="ec">حالة الطلب ✏️</th>
         </tr></thead><tbody id="tB"></tbody></table>
         <div class="em" id="emMsg" style="display:none">لا توجد طلبات حالياً</div>
@@ -130,7 +130,7 @@ const SB_URL = 'https://vievkkhwwsdeecxazfqp.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpZXZra2h3d3NkZWVjeGF6ZnFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxNDY3MDAsImV4cCI6MjA5MDcyMjcwMH0.okIbSC-_GSeXcNgxTLlwZ2SVvJtMs14pVcFGq_nbJPQ';
 const db = window.supabase.createClient(SB_URL, SB_KEY);
 
-let CU = null, ALL = [];
+let CU = null, ALL = [], supMap = {};
 
 // ========== LOGIN ==========
 async function doLogin() {
@@ -150,7 +150,13 @@ function showMain() {
     document.getElementById('loginOv').classList.add('h');
     document.getElementById('mainP').classList.add('s');
     document.getElementById('uBadge').textContent = CU.display_name;
+    loadSupMap();
     load();
+}
+
+async function loadSupMap() {
+    const { data } = await db.from('hr_users').select('id,display_name');
+    if (data) data.forEach(u => { supMap[u.id] = u.display_name; });
 }
 
 function doLogout() { sessionStorage.removeItem('hr_sup'); CU = null; location.reload(); }
@@ -216,6 +222,7 @@ function render(rows) {
             <td class="ro" style="white-space:nowrap;font-size:10.5px">${dt}</td>
             <td class="ro" style="font-size:10.5px">${r.sla_text}</td>
             <td class="ro"><span class="st ${slC}">${sla}</span></td>
+            <td class="ro" style="font-size:11px;white-space:nowrap">${r.updated_by ? (supMap[r.updated_by] || '—') : '—'}</td>
             <td class="ed"><textarea class="fi" data-id="${r.id}" onchange="saveFB(this)">${r.hr_feedback || ''}</textarea></td>
             <td class="ed"><select class="ss ${stCls(r.status)}" data-id="${r.id}" onchange="saveST(this)">
                 <option value="لم يتم العمل عليه" ${r.status==='لم يتم العمل عليه'?'selected':''}>لم يتم العمل عليه</option>
@@ -251,12 +258,13 @@ function showToast() {
 // ========== EXPORT ==========
 function expCSV() {
     if (!ALL.length) { alert('لا توجد بيانات'); return; }
-    let c = '\uFEFF' + 'رقم الطلب,الرقم الوظيفي,الهاتف,الإدارة,نوع الطلب,تفاصيل فرعية,تعليق,تاريخ الإرسال,SLA,الحالة,HR Feedback,تاريخ التحديث,Ontime/SLA\n';
+    let c = '\uFEFF' + 'رقم الطلب,الرقم الوظيفي,الهاتف,الإدارة,نوع الطلب,تفاصيل فرعية,تعليق,تاريخ الإرسال,SLA,الحالة,HR Feedback,تم التنفيذ بواسطة,تاريخ التحديث,Ontime/SLA\n';
     ALL.forEach(r => {
         const sla = slaCheck(r);
         const dt = new Date(r.submitted_at).toLocaleString('ar-EG');
         const udt = r.status_updated_at ? new Date(r.status_updated_at).toLocaleString('ar-EG') : '';
-        c += `${r.ticket},${r.emp_id},${r.phone},${r.department},${r.request_name},"${subDetail(r)}","${r.comment||''}",${dt},${r.sla_text},${r.status},"${r.hr_feedback||''}",${udt},${sla}\n`;
+        const byName = r.updated_by ? (supMap[r.updated_by] || r.updated_by) : '';
+        c += `${r.ticket},${r.emp_id},${r.phone},${r.department},${r.request_name},"${subDetail(r)}","${r.comment||''}",${dt},${r.sla_text},${r.status},"${r.hr_feedback||''}","${byName}",${udt},${sla}\n`;
     });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([c], { type: 'text/csv;charset=utf-8;' }));
