@@ -149,6 +149,7 @@
                 <label style="font-size:11px;color:var(--text-mid)">إلى</label>
                 <input type="date" id="dTo" onchange="loadDash()" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-family:'Tajawal',sans-serif;font-size:12px;outline:none">
                 <button onclick="clearDates()" style="padding:5px 12px;background:var(--err-bg);color:var(--err);border:none;border-radius:6px;font-family:'Tajawal',sans-serif;font-size:11px;font-weight:700;cursor:pointer">✕ مسح</button>
+                <button onclick="adminExport()" style="padding:5px 14px;background:var(--ok);color:#fff;border:none;border-radius:6px;font-family:'Tajawal',sans-serif;font-size:11px;font-weight:700;cursor:pointer;margin-right:auto">📥 تصدير Excel</button>
             </div>
             <div class="kg">
                 <div class="kp k-total"><div class="kl">إجمالي الطلبات المستلمة</div><div class="kv" id="kT">0</div></div>
@@ -170,6 +171,11 @@
 
             <div class="bd"><h3>تقرير مستوى الخدمة (SLA) حسب نوع الطلب</h3>
                 <table class="bt"><thead><tr><th>نوع الطلب</th><th>إجمالي المنجزة</th><th>Ontime</th><th>Out SLA</th><th>نسبة الالتزام</th></tr></thead><tbody id="sTB"></tbody></table>
+            </div>
+
+            <div class="bd"><h3>📋 أداء المشرفين (Supervisor Performance)</h3>
+                <p style="font-size:11px;color:var(--text-light);margin-bottom:10px">تتبع إنتاجية كل مشرف وجودة التنفيذ ضمن الـ SLA المحدد</p>
+                <table class="bt"><thead><tr><th>المشرف</th><th>إجمالي الطلبات المنجزة</th><th>Ontime ✅</th><th>Out of SLA ❌</th><th>نسبة الالتزام</th><th>متوسط وقت الإنجاز</th></tr></thead><tbody id="supTB"></tbody></table>
             </div>
         </div>
 
@@ -220,7 +226,7 @@ const db = window.supabase.createClient(SB_URL, SB_KEY);
 let CU = null;
 const DEPTS = ['المبيعات','سلاسل الامداد','خدمة العملاء','التصنيع','دعم الاعمال','تكنولوجيا المعلومات','الحسابات','شركة الجملة'];
 const RN = {'1':'مفردات المرتب','2':'رصيد الاجازات','3':'سجل حضور/انصراف','4':'HR Letter','5':'شكوى','6':'ختم أوراق','7':'سلفة','8':'إبلاغ عن مخالفة'};
-let chT = null, chS = null;
+let chT = null, chS = null, allReqs = [], usersMap = {};
 
 // ========== LOGIN ==========
 async function doLogin() {
@@ -290,6 +296,11 @@ function clearDates() {
 
 // ========== DASHBOARD ==========
 async function loadDash() {
+    // Load users map for updated_by display
+    const { data: usrs } = await db.from('hr_users').select('id,display_name');
+    usersMap = {};
+    if (usrs) usrs.forEach(u => { usersMap[u.id] = u.display_name; });
+
     let query = db.from('hr_requests').select('*');
     const from = document.getElementById('dFrom').value;
     const to = document.getElementById('dTo').value;
@@ -297,6 +308,7 @@ async function loadDash() {
     if (to) query = query.lte('submitted_at', to + 'T23:59:59');
     const { data: reqs } = await query;
     if (!reqs) return;
+    allReqs = reqs;
     const total = reqs.length;
     const pend = reqs.filter(r => r.status === 'لم يتم العمل عليه').length;
     const prog = reqs.filter(r => r.status === 'قيد التنفيذ').length;
@@ -365,6 +377,55 @@ async function loadDash() {
         const pct = tt ? Math.round(ton / tt * 100) : 0;
         return `<tr><td style="font-weight:700">${RN[k]}</td><td>${tt}</td><td><span class="tOn">${ton}</span></td><td><span class="tOut">${tout}</span></td><td style="font-weight:700;color:${pct >= 80 ? 'var(--ok)' : pct > 0 ? 'var(--err)' : 'var(--text-light)'}">${tt ? pct + '%' : '—'}</td></tr>`;
     }).join('');
+
+    // Supervisor performance
+    const supPerf = {};
+    reqs.forEach(r => {
+        if (r.status === 'تم الانتهاء' && r.updated_by && r.status_updated_at) {
+            if (!supPerf[r.updated_by]) supPerf[r.updated_by] = { on: 0, out: 0, totalHrs: 0 };
+            const hrs = (new Date(r.status_updated_at) - new Date(r.submitted_at)) / 36e5;
+            hrs <= (r.sla_hours || 24) ? supPerf[r.updated_by].on++ : supPerf[r.updated_by].out++;
+            supPerf[r.updated_by].totalHrs += hrs;
+        }
+    });
+    const supRows = Object.keys(supPerf).map(uid => {
+        const s = supPerf[uid];
+        const tt = s.on + s.out;
+        const pct = tt ? Math.round(s.on / tt * 100) : 0;
+        const avgH = tt ? (s.totalHrs / tt) : 0;
+        const avgTxt = avgH < 24 ? Math.round(avgH) + ' ساعة' : (avgH / 24).toFixed(1) + ' يوم';
+        const name = usersMap[uid] || uid;
+        return `<tr><td style="font-weight:700">${name}</td><td>${tt}</td><td><span class="tOn">${s.on}</span></td><td><span class="tOut">${s.out}</span></td><td style="font-weight:700;color:${pct >= 80 ? 'var(--ok)' : pct > 0 ? 'var(--err)' : 'var(--text-light)'}">${pct}%</td><td>${avgTxt}</td></tr>`;
+    });
+    document.getElementById('supTB').innerHTML = supRows.length ? supRows.join('') : '<tr><td colspan="6" style="text-align:center;color:var(--text-light);padding:20px">لا توجد بيانات أداء بعد</td></tr>';
+}
+
+// ========== ADMIN EXPORT ==========
+function adminExport() {
+    if (!allReqs.length) { alert('لا توجد بيانات'); return; }
+    function slaChk(r) {
+        if (r.status !== 'تم الانتهاء' || !r.status_updated_at) return '—';
+        const h = (new Date(r.status_updated_at) - new Date(r.submitted_at)) / 36e5;
+        return h <= (r.sla_hours || 24) ? 'Ontime' : 'Out of SLA';
+    }
+    function ext(r) {
+        if (r.request_type === '4') return 'الجهة: ' + (r.hr_letter_dest || '—');
+        if (r.request_type === '5') return 'سبب الشكوى: ' + (r.complaint_reason || '—');
+        if (r.request_type === '8') return 'نوع المخالفة: ' + (r.violation_reason || '—');
+        return '—';
+    }
+    let c = '\uFEFF' + 'رقم الطلب,الرقم الوظيفي,الهاتف,الإدارة,نوع الطلب,تفاصيل فرعية,تعليق,تاريخ الإرسال,SLA,الحالة,HR Feedback,تم التنفيذ بواسطة,تاريخ التحديث,Ontime/SLA\n';
+    allReqs.forEach(r => {
+        const sla = slaChk(r);
+        const dt = new Date(r.submitted_at).toLocaleString('ar-EG');
+        const udt = r.status_updated_at ? new Date(r.status_updated_at).toLocaleString('ar-EG') : '';
+        const byName = r.updated_by ? (usersMap[r.updated_by] || r.updated_by) : '';
+        c += `${r.ticket},${r.emp_id},${r.phone},${r.department},${r.request_name},"${ext(r)}","${r.comment || ''}",${dt},${r.sla_text},${r.status},"${r.hr_feedback || ''}","${byName}",${udt},${sla}\n`;
+    });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([c], { type: 'text/csv;charset=utf-8;' }));
+    a.download = `HR_Admin_Report_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
 }
 
 // ========== USER MANAGEMENT ==========
