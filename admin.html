@@ -101,6 +101,9 @@
         .merr{color:var(--err);font-size:11px;margin-top:5px;display:none}.merr.s{display:block}
 
         @media(max-width:768px){.cg{grid-template-columns:1fr}.kg{grid-template-columns:repeat(2,1fr)}.dh{flex-direction:column;gap:8px;text-align:center}}
+        .dfb{padding:5px 12px;background:var(--accent-pale);color:var(--primary);border:1.5px solid var(--border);border-radius:6px;font-family:'Tajawal',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:.2s}
+        .dfb:hover{background:var(--accent-light);border-color:var(--accent)}
+        .dfb.dfa{background:var(--primary);color:#fff;border-color:var(--primary)}
     </style>
 </head>
 <body>
@@ -133,6 +136,20 @@
     <div class="dc">
         <!-- TAB: DASHBOARD -->
         <div class="tc a" id="tDash">
+            <!-- DATE FILTER -->
+            <div style="background:var(--card);border-radius:12px;padding:12px 16px;margin-bottom:16px;box-shadow:var(--shadow);display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+                <span style="font-size:12px;font-weight:700;color:var(--primary-dark)">📅 فلتر الفترة:</span>
+                <button class="dfb dfa" onclick="setQuick('all')">الكل</button>
+                <button class="dfb" onclick="setQuick('today')">اليوم</button>
+                <button class="dfb" onclick="setQuick('week')">هذا الأسبوع</button>
+                <button class="dfb" onclick="setQuick('month')">هذا الشهر</button>
+                <span style="font-size:11px;color:var(--text-light);margin:0 4px">|</span>
+                <label style="font-size:11px;color:var(--text-mid)">من</label>
+                <input type="date" id="dFrom" onchange="loadDash()" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-family:'Tajawal',sans-serif;font-size:12px;outline:none">
+                <label style="font-size:11px;color:var(--text-mid)">إلى</label>
+                <input type="date" id="dTo" onchange="loadDash()" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-family:'Tajawal',sans-serif;font-size:12px;outline:none">
+                <button onclick="clearDates()" style="padding:5px 12px;background:var(--err-bg);color:var(--err);border:none;border-radius:6px;font-family:'Tajawal',sans-serif;font-size:11px;font-weight:700;cursor:pointer">✕ مسح</button>
+            </div>
             <div class="kg">
                 <div class="kp k-total"><div class="kl">إجمالي الطلبات المستلمة</div><div class="kv" id="kT">0</div></div>
                 <div class="kp k-pend"><div class="kl">لم يتم العمل عليه</div><div class="kv" id="kP">0</div></div>
@@ -241,9 +258,44 @@ function swTab(t) {
     if (t === 'dash') loadDash();
 }
 
+// ========== DATE FILTERS ==========
+function setQuick(period) {
+    document.querySelectorAll('.dfb').forEach(b => b.classList.remove('dfa'));
+    event.target.classList.add('dfa');
+    const now = new Date();
+    const dFrom = document.getElementById('dFrom');
+    const dTo = document.getElementById('dTo');
+    if (period === 'all') { dFrom.value = ''; dTo.value = ''; }
+    else if (period === 'today') {
+        const today = now.toISOString().slice(0,10);
+        dFrom.value = today; dTo.value = today;
+    } else if (period === 'week') {
+        const day = now.getDay();
+        const diff = day === 0 ? 6 : day - 1; // Monday start
+        const mon = new Date(now); mon.setDate(now.getDate() - diff);
+        dFrom.value = mon.toISOString().slice(0,10); dTo.value = now.toISOString().slice(0,10);
+    } else if (period === 'month') {
+        const first = new Date(now.getFullYear(), now.getMonth(), 1);
+        dFrom.value = first.toISOString().slice(0,10); dTo.value = now.toISOString().slice(0,10);
+    }
+    loadDash();
+}
+function clearDates() {
+    document.getElementById('dFrom').value = '';
+    document.getElementById('dTo').value = '';
+    document.querySelectorAll('.dfb').forEach(b => b.classList.remove('dfa'));
+    document.querySelector('.dfb').classList.add('dfa');
+    loadDash();
+}
+
 // ========== DASHBOARD ==========
 async function loadDash() {
-    const { data: reqs } = await db.from('hr_requests').select('*');
+    let query = db.from('hr_requests').select('*');
+    const from = document.getElementById('dFrom').value;
+    const to = document.getElementById('dTo').value;
+    if (from) query = query.gte('submitted_at', from + 'T00:00:00');
+    if (to) query = query.lte('submitted_at', to + 'T23:59:59');
+    const { data: reqs } = await query;
     if (!reqs) return;
     const total = reqs.length;
     const pend = reqs.filter(r => r.status === 'لم يتم العمل عليه').length;
