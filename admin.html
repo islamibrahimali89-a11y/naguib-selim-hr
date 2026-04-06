@@ -414,13 +414,14 @@ function adminExport() {
         if (r.request_type === '8') return 'نوع المخالفة: ' + (r.violation_reason || '—');
         return '—';
     }
-    let c = '\uFEFF' + 'رقم الطلب,الرقم الوظيفي,الهاتف,الإدارة,نوع الطلب,تفاصيل فرعية,تعليق,تاريخ الإرسال,SLA,الحالة,HR Feedback,تم التنفيذ بواسطة,تاريخ التحديث,Ontime/SLA\n';
+    let c = '\uFEFF' + 'رقم الطلب,الرقم الوظيفي,الهاتف,الإدارة,المنطقة,نوع الطلب,تفاصيل فرعية,تعليق,تاريخ الإرسال,SLA,الحالة,HR Feedback,مسند إلى,تم التنفيذ بواسطة,تاريخ التحديث,Ontime/SLA\n';
     allReqs.forEach(r => {
         const sla = slaChk(r);
         const dt = new Date(r.submitted_at).toLocaleString('ar-EG');
         const udt = r.status_updated_at ? new Date(r.status_updated_at).toLocaleString('ar-EG') : '';
         const byName = r.updated_by ? (usersMap[r.updated_by] || r.updated_by) : '';
-        c += `${r.ticket},${r.emp_id},${r.phone},${r.department},${r.request_name},"${ext(r)}","${r.comment || ''}",${dt},${r.sla_text},${r.status},"${r.hr_feedback || ''}","${byName}",${udt},${sla}\n`;
+        const assignName = r.assigned_to ? (usersMap[r.assigned_to] || '') : '';
+        c += `${r.ticket},${r.emp_id},${r.phone},${r.department},${r.zone||''},${r.request_name},"${ext(r)}","${r.comment || ''}",${dt},${r.sla_text},${r.status},"${r.hr_feedback || ''}","${assignName}","${byName}",${udt},${sla}\n`;
     });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([c], { type: 'text/csv;charset=utf-8;' }));
