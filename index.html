@@ -124,6 +124,18 @@
             <div class="et" id="deptErr">برجاء اختيار الإدارة</div>
         </div>
 
+        <div class="fg">
+            <label><span class="rq">*</span> المنطقة</label>
+            <select id="zone">
+                <option value="">— اختر المنطقة —</option>
+                <option value="المبنى الاداري">المبنى الاداري</option>
+                <option value="الفروع">الفروع</option>
+                <option value="المخازن">المخازن</option>
+                <option value="التصنيع">التصنيع</option>
+            </select>
+            <div class="et" id="zoneErr">برجاء اختيار المنطقة</div>
+        </div>
+
         <div class="sec-title" style="margin-top:22px">تفاصيل الطلب</div>
 
         <div class="fg">
@@ -268,6 +280,7 @@ async function submitRequest() {
     const empId = document.getElementById('empId').value.trim();
     const phone = document.getElementById('phone').value.trim();
     const dept = document.getElementById('dept').value;
+    const zn = document.getElementById('zone').value;
     const rt = document.getElementById('reqType').value;
     let ok = true;
 
@@ -275,6 +288,7 @@ async function submitRequest() {
     if (!vld('empId','empIdErr', !/^\d{1,4}$/.test(empId))) ok = false;
     if (!vld('phone','phoneErr', !/^\d{11}$/.test(phone))) ok = false;
     if (!vld('dept','deptErr', !dept)) ok = false;
+    if (!vld('zone','zoneErr', !zn)) ok = false;
     if (!vld('reqType','reqTypeErr', !rt)) ok = false;
 
     // طلب مفردات المرتب - متاح من يوم 1 لـ 5 فقط
@@ -311,6 +325,7 @@ async function submitRequest() {
         emp_id: empId,
         phone: phone,
         department: dept,
+        zone: zn,
         request_type: rt,
         request_name: REQ_NAMES[rt],
         hr_letter_dest: rt==='4' ? document.getElementById('hrDest').value.trim() : '',
@@ -340,7 +355,7 @@ async function submitRequest() {
 
     // Reset form
     ['empId','phone','comment','hrDest'].forEach(id => document.getElementById(id).value = '');
-    ['dept','reqType','compReason','violReason'].forEach(id => document.getElementById(id).value = '');
+    ['dept','reqType','compReason','violReason','zone'].forEach(id => document.getElementById(id).value = '');
     onTypeChange();
 }
 
