@@ -10,8 +10,6 @@
         :root{--primary:#693C0F;--primary-light:#8B5E34;--primary-dark:#4A2A0A;--accent:#D4A574;--accent-light:#F0DCC8;--accent-pale:#FAF4ED;--bg:#F7F4F0;--card:#FFFFFF;--text:#2C2218;--text-mid:#5C4A3A;--text-light:#8C7B6B;--border:#E8DFD4;--border-lt:#F2ECE4;--ok:#2E7D32;--ok-bg:#E8F5E9;--err:#B71C1C;--err-bg:#FFEBEE;--blue:#1565C0;--blue-bg:#E3F2FD;--shadow:0 4px 16px rgba(74,42,10,.07)}
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-
-        /* LOGIN */
         .lo{position:fixed;inset:0;background:linear-gradient(160deg,var(--primary-dark),var(--primary),var(--primary-light));display:flex;align-items:center;justify-content:center;z-index:9999}
         .lo.h{display:none}
         .lb{background:#fff;border-radius:20px;padding:38px 28px;width:90%;max-width:370px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
@@ -23,8 +21,6 @@
         .lbn{width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-family:'Tajawal',sans-serif;font-size:15px;font-weight:700;cursor:pointer}
         .lbn:hover{background:var(--primary-dark)}
         .le{color:var(--err);font-size:12px;margin-top:8px;display:none}.le.s{display:block}
-
-        /* MAIN */
         .mp{display:none}.mp.s{display:block}
         .hdr{background:var(--primary-dark);padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
         .hdr h1{color:#fff;font-size:19px;font-weight:800}
@@ -33,49 +29,62 @@
         .ub{background:rgba(255,255,255,.1);color:var(--accent);padding:5px 14px;border-radius:18px;font-size:12px;font-weight:600}
         .lout{background:rgba(255,255,255,.1);color:#fff;border:none;padding:6px 14px;border-radius:8px;font-family:'Tajawal',sans-serif;font-size:12px;cursor:pointer}
         .lout:hover{background:rgba(255,255,255,.2)}
-        .abar{height:3px;background:linear-gradient(to right,var(--accent),var(--primary-light),var(--accent));opacity:.35}
+        /* BELL */
+        .bell-wrap{position:relative;cursor:pointer}
+        .bell-btn{background:rgba(255,255,255,.1);color:#fff;border:none;padding:7px 10px;border-radius:8px;font-size:18px;cursor:pointer;position:relative}
+        .bell-btn:hover{background:rgba(255,255,255,.2)}
+        .bell-count{position:absolute;top:-4px;right:-4px;background:var(--err);color:#fff;font-size:9px;font-weight:800;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--primary-dark)}
+        .bell-count.hide{display:none}
+        /* Notification dropdown */
+        .notif-dd{display:none;position:absolute;top:42px;left:0;width:320px;max-height:400px;overflow-y:auto;background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.18);z-index:100;border:1px solid var(--border)}
+        .notif-dd.open{display:block}
+        .notif-dd-hdr{padding:12px 14px;border-bottom:1px solid var(--border-lt);display:flex;justify-content:space-between;align-items:center}
+        .notif-dd-hdr span{font-size:13px;font-weight:700;color:var(--primary-dark)}
+        .notif-dd-hdr button{font-size:11px;color:var(--blue);background:none;border:none;cursor:pointer;font-family:'Tajawal',sans-serif;font-weight:600}
+        .notif-item{padding:12px 14px;border-bottom:1px solid var(--border-lt);cursor:pointer;transition:.15s}
+        .notif-item:hover{background:var(--accent-pale)}
+        .notif-item.unread{background:#FFF8F0;border-right:3px solid var(--primary)}
+        .notif-from{font-size:12px;font-weight:700;color:var(--primary)}
+        .notif-msg{font-size:11px;color:var(--text-mid);margin-top:2px;line-height:1.5}
+        .notif-time{font-size:10px;color:var(--text-light);margin-top:3px}
+        .notif-empty{padding:30px;text-align:center;color:var(--text-light);font-size:13px}
 
-        /* TOOLBAR */
+        .abar{height:3px;background:linear-gradient(to right,var(--accent),var(--primary-light),var(--accent));opacity:.35}
         .tb{background:var(--card);padding:12px 18px;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-        .tb select,.tb input[type="text"]{padding:7px 11px;border:1.5px solid var(--border);border-radius:7px;font-family:'Tajawal',sans-serif;font-size:12px;background:var(--accent-pale);outline:none}
+        .tb select,.tb input[type="text"],.tb input[type="date"]{padding:7px 11px;border:1.5px solid var(--border);border-radius:7px;font-family:'Tajawal',sans-serif;font-size:12px;background:var(--accent-pale);outline:none}
         .tb select:focus,.tb input:focus{border-color:var(--primary)}
         .tbtn{padding:7px 16px;border:none;border-radius:7px;font-family:'Tajawal',sans-serif;font-size:12px;font-weight:700;cursor:pointer}
         .tbtn-r{background:var(--primary);color:#fff}.tbtn-r:hover{background:var(--primary-dark)}
         .tbtn-e{background:var(--ok);color:#fff;margin-right:auto}.tbtn-e:hover{background:#1B5E20}
-
-        /* TABLE */
         .tw{padding:14px;overflow-x:auto}
-        table{width:100%;min-width:1650px;border-collapse:separate;border-spacing:0;background:var(--card);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+        table{width:100%;min-width:1800px;border-collapse:separate;border-spacing:0;background:var(--card);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
         thead{background:var(--primary-dark)}
         thead th{color:#fff;font-size:11px;font-weight:700;padding:12px 9px;text-align:right;white-space:nowrap}
         thead th.ec{background:var(--primary-light)}
         tbody tr{transition:.15s}tbody tr:hover{background:rgba(105,60,15,.02)}
         tbody td{padding:9px;font-size:12px;vertical-align:top;border-bottom:1px solid #f0ebe5}
         .ro{background:#FDFBF8}.ed{background:#FFFCF5}
-
         .ss{padding:5px 7px;border-radius:6px;border:1.5px solid var(--border);font-family:'Tajawal',sans-serif;font-size:11px;font-weight:700;cursor:pointer;outline:none;width:100%;min-width:125px}
         .sP{background:var(--err-bg);color:var(--err);border-color:#EF9A9A}
         .sI{background:var(--blue-bg);color:var(--blue);border-color:#90CAF9}
         .sD{background:var(--ok-bg);color:var(--ok);border-color:#A5D6A7}
-
-        .fi{width:100%;min-width:160px;padding:6px 9px;border:1.5px solid var(--accent);border-radius:6px;font-family:'Tajawal',sans-serif;font-size:11.5px;resize:vertical;min-height:44px;outline:none;background:#fff}
+        .fi{width:100%;min-width:180px;padding:6px 9px;border:1.5px solid var(--accent);border-radius:6px;font-family:'Tajawal',sans-serif;font-size:11.5px;resize:vertical;min-height:48px;outline:none;background:#fff}
         .fi:focus{border-color:var(--primary);box-shadow:0 0 0 2px rgba(105,60,15,.06)}
-
         .st{padding:3px 7px;border-radius:4px;font-size:10.5px;font-weight:700;white-space:nowrap}
-        .sOn{background:var(--ok-bg);color:var(--ok)}
-        .sOut{background:var(--err-bg);color:var(--err)}
-        .sNA{background:#F5F5F5;color:#999}
-
+        .sOn{background:var(--ok-bg);color:var(--ok)}.sOut{background:var(--err-bg);color:var(--err)}.sNA{background:#F5F5F5;color:#999}
+        .assign-tag{padding:3px 8px;border-radius:10px;font-size:10.5px;font-weight:700;background:var(--accent-pale);color:var(--primary);white-space:nowrap}
         .em{text-align:center;padding:45px 20px;color:var(--text-light);font-size:15px}
         .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ok);color:#fff;padding:9px 22px;border-radius:10px;font-weight:700;font-size:13px;box-shadow:0 4px 20px rgba(0,0,0,.2);transition:transform .3s;z-index:999}
         .toast.pop{transform:translateX(-50%) translateY(0)}
-
+        /* Mention hint */
+        .mention-hint{display:none;position:absolute;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:50;max-height:150px;overflow-y:auto}
+        .mention-hint.open{display:block}
+        .mention-opt{padding:8px 12px;font-size:12px;cursor:pointer;font-family:'Tajawal',sans-serif}
+        .mention-opt:hover{background:var(--accent-pale)}
         @media(max-width:768px){.tb{flex-direction:column}.tbtn-e{margin-right:0;width:100%}.hdr{flex-direction:column;gap:8px;text-align:center}.hdr-l{justify-content:center}}
     </style>
 </head>
 <body>
-
-<!-- LOGIN -->
 <div class="lo" id="loginOv">
     <div class="lb">
         <div class="ll">ن</div>
@@ -88,14 +97,23 @@
     </div>
 </div>
 
-<!-- MAIN -->
 <div class="mp" id="mainP">
     <div class="hdr">
         <div><h1>لوحة المشرف — طلبات HR</h1><p class="hp">عرض ومعالجة طلبات الموارد البشرية</p></div>
-        <div class="hdr-l"><div class="ub" id="uBadge">—</div><button class="lout" onclick="doLogout()">خروج</button></div>
+        <div class="hdr-l">
+            <!-- BELL -->
+            <div class="bell-wrap" id="bellWrap">
+                <button class="bell-btn" onclick="toggleNotif()">🔔<span class="bell-count hide" id="bellCount">0</span></button>
+                <div class="notif-dd" id="notifDD">
+                    <div class="notif-dd-hdr"><span>الإشعارات</span><button onclick="markAllRead()">تحديد الكل كمقروء</button></div>
+                    <div id="notifList"><div class="notif-empty">لا توجد إشعارات</div></div>
+                </div>
+            </div>
+            <div class="ub" id="uBadge">—</div>
+            <button class="lout" onclick="doLogout()">خروج</button>
+        </div>
     </div>
     <div class="abar"></div>
-
     <div class="tb">
         <select id="fD" onchange="load()"><option value="">كل الإدارات</option><option value="المبيعات">المبيعات</option><option value="سلاسل الامداد">سلاسل الامداد</option><option value="خدمة العملاء">خدمة العملاء</option><option value="التصنيع">التصنيع</option><option value="دعم الاعمال">دعم الاعمال</option><option value="تكنولوجيا المعلومات">تكنولوجيا المعلومات</option><option value="الحسابات">الحسابات</option><option value="شركة الجملة">شركة الجملة</option></select>
         <select id="fS" onchange="load()"><option value="">كل الحالات</option><option value="لم يتم العمل عليه">لم يتم العمل عليه</option><option value="قيد التنفيذ">قيد التنفيذ</option><option value="تم الانتهاء">تم الانتهاء</option></select>
@@ -103,127 +121,125 @@
         <input type="text" id="fQ" placeholder="بحث برقم الطلب..." oninput="load()">
         <span style="font-size:11px;color:var(--text-light)">|</span>
         <label style="font-size:11px;color:var(--text-mid)">من</label>
-        <input type="date" id="dFrom" onchange="load()" style="padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-family:'Tajawal',sans-serif;font-size:11px;outline:none">
+        <input type="date" id="dFrom" onchange="load()">
         <label style="font-size:11px;color:var(--text-mid)">إلى</label>
-        <input type="date" id="dTo" onchange="load()" style="padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-family:'Tajawal',sans-serif;font-size:11px;outline:none">
+        <input type="date" id="dTo" onchange="load()">
         <button onclick="document.getElementById('dFrom').value='';document.getElementById('dTo').value='';load()" style="padding:5px 10px;background:var(--err-bg);color:var(--err);border:none;border-radius:5px;font-family:'Tajawal',sans-serif;font-size:10px;font-weight:700;cursor:pointer">✕</button>
         <button class="tbtn tbtn-r" onclick="load()">🔄 تحديث</button>
         <button class="tbtn tbtn-e" onclick="expCSV()">📥 تصدير Excel</button>
     </div>
-
     <div class="tw">
         <table><thead><tr>
-            <th>#</th><th>رقم الطلب</th><th>الرقم الوظيفي</th><th>الهاتف</th><th>الإدارة</th>
+            <th>#</th><th>رقم الطلب</th><th>الرقم الوظيفي</th><th>الهاتف</th><th>الإدارة</th><th>المنطقة</th>
             <th>نوع الطلب</th><th>تفاصيل فرعية</th><th>تعليق</th><th>تاريخ الإرسال</th>
-            <th>SLA</th><th>Ontime / Out SLA</th><th>تم التنفيذ بواسطة</th>
+            <th>SLA</th><th>Ontime/SLA</th><th>مسند إلى</th><th>تم التنفيذ بواسطة</th>
             <th class="ec">HR Feedback ✏️</th><th class="ec">حالة الطلب ✏️</th>
         </tr></thead><tbody id="tB"></tbody></table>
         <div class="em" id="emMsg" style="display:none">لا توجد طلبات حالياً</div>
     </div>
 </div>
-
 <div class="toast" id="toast">✅ تم الحفظ</div>
+<!-- Mention hint popup (moves to active textarea) -->
+<div class="mention-hint" id="mentionHint"></div>
 
 <script>
-// ========== SUPABASE ==========
-const SB_URL = 'https://vievkkhwwsdeecxazfqp.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpZXZra2h3d3NkZWVjeGF6ZnFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxNDY3MDAsImV4cCI6MjA5MDcyMjcwMH0.okIbSC-_GSeXcNgxTLlwZ2SVvJtMs14pVcFGq_nbJPQ';
-const db = window.supabase.createClient(SB_URL, SB_KEY);
-
-let CU = null, ALL = [], supMap = {};
+const SB_URL='https://vievkkhwwsdeecxazfqp.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpZXZra2h3d3NkZWVjeGF6ZnFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxNDY3MDAsImV4cCI6MjA5MDcyMjcwMH0.okIbSC-_GSeXcNgxTLlwZ2SVvJtMs14pVcFGq_nbJPQ';
+const db=window.supabase.createClient(SB_URL,SB_KEY);
+let CU=null,ALL=[],supMap={},supList=[];
 
 // ========== LOGIN ==========
-async function doLogin() {
-    const u = document.getElementById('lUser').value.trim();
-    const p = document.getElementById('lPass').value;
-    if (!u || !p) return;
-    const { data, error } = await db.rpc('verify_password', { p_username: u, p_password: p });
-    if (error || !data || !data.length) { document.getElementById('lErr').classList.add('s'); return; }
-    const user = data[0];
-    if (user.role !== 'supervisor' && user.role !== 'admin') { document.getElementById('lErr').classList.add('s'); return; }
-    CU = user;
-    sessionStorage.setItem('hr_sup', JSON.stringify(user));
-    showMain();
+async function doLogin(){
+    const u=document.getElementById('lUser').value.trim(),p=document.getElementById('lPass').value;
+    if(!u||!p)return;
+    const{data,error}=await db.rpc('verify_password',{p_username:u,p_password:p});
+    if(error||!data||!data.length){document.getElementById('lErr').classList.add('s');return;}
+    const user=data[0];
+    if(user.role!=='supervisor'&&user.role!=='admin'){document.getElementById('lErr').classList.add('s');return;}
+    CU=user;sessionStorage.setItem('hr_sup',JSON.stringify(user));showMain();
+}
+function showMain(){
+    document.getElementById('loginOv').classList.add('h');document.getElementById('mainP').classList.add('s');
+    document.getElementById('uBadge').textContent=CU.display_name;
+    loadSupMap();load();loadNotifs();
+}
+function doLogout(){sessionStorage.removeItem('hr_sup');CU=null;location.reload();}
+const sv=sessionStorage.getItem('hr_sup');if(sv){CU=JSON.parse(sv);showMain();}
+document.getElementById('lPass').addEventListener('keyup',e=>{if(e.key==='Enter')doLogin();});
+
+async function loadSupMap(){
+    const{data}=await db.from('hr_users').select('id,username,display_name,role');
+    supMap={};supList=[];
+    if(data)data.forEach(u=>{supMap[u.id]=u.display_name;if(u.role==='supervisor'||u.role==='admin')supList.push({id:u.id,name:u.display_name,username:u.username});});
 }
 
-function showMain() {
-    document.getElementById('loginOv').classList.add('h');
-    document.getElementById('mainP').classList.add('s');
-    document.getElementById('uBadge').textContent = CU.display_name;
-    loadSupMap();
-    load();
+// ========== NOTIFICATIONS ==========
+let notifOpen=false;
+function toggleNotif(){notifOpen=!notifOpen;document.getElementById('notifDD').classList.toggle('open',notifOpen);}
+// Close on outside click
+document.addEventListener('click',e=>{if(!document.getElementById('bellWrap').contains(e.target)){notifOpen=false;document.getElementById('notifDD').classList.remove('open');}});
+
+async function loadNotifs(){
+    if(!CU)return;
+    const{data}=await db.from('hr_notifications').select('*').eq('to_user_id',CU.id).order('created_at',{ascending:false}).limit(30);
+    if(!data)return;
+    const unread=data.filter(n=>!n.is_read).length;
+    const bc=document.getElementById('bellCount');
+    bc.textContent=unread;bc.classList.toggle('hide',unread===0);
+    const list=document.getElementById('notifList');
+    if(!data.length){list.innerHTML='<div class="notif-empty">لا توجد إشعارات</div>';return;}
+    list.innerHTML=data.map(n=>{
+        const fromName=supMap[n.from_user_id]||'مستخدم';
+        const ago=timeAgo(new Date(n.created_at));
+        return`<div class="notif-item ${n.is_read?'':'unread'}" onclick="readNotif('${n.id}')">
+            <div class="notif-from">${fromName} ذكرك في طلب ${n.ticket}</div>
+            <div class="notif-msg">${n.message}</div>
+            <div class="notif-time">${ago}</div>
+        </div>`;
+    }).join('');
 }
-
-async function loadSupMap() {
-    const { data } = await db.from('hr_users').select('id,display_name');
-    if (data) data.forEach(u => { supMap[u.id] = u.display_name; });
-}
-
-function doLogout() { sessionStorage.removeItem('hr_sup'); CU = null; location.reload(); }
-
-// Auto-session
-const sv = sessionStorage.getItem('hr_sup');
-if (sv) { CU = JSON.parse(sv); showMain(); }
-document.getElementById('lPass').addEventListener('keyup', e => { if (e.key === 'Enter') doLogin(); });
+function timeAgo(d){const s=Math.floor((Date.now()-d)/1000);if(s<60)return'الآن';if(s<3600)return Math.floor(s/60)+' دقيقة';if(s<86400)return Math.floor(s/3600)+' ساعة';return Math.floor(s/86400)+' يوم';}
+async function readNotif(id){await db.from('hr_notifications').update({is_read:true}).eq('id',id);loadNotifs();}
+async function markAllRead(){if(!CU)return;await db.from('hr_notifications').update({is_read:true}).eq('to_user_id',CU.id).eq('is_read',false);loadNotifs();}
 
 // ========== LOAD TABLE ==========
-async function load() {
-    let q = db.from('hr_requests').select('*').order('submitted_at', { ascending: false });
-    const fd = document.getElementById('fD').value;
-    const fs = document.getElementById('fS').value;
-    const ft = document.getElementById('fT').value;
-    const fq = document.getElementById('fQ').value.trim().toLowerCase();
-    const dfrom = document.getElementById('dFrom').value;
-    const dto = document.getElementById('dTo').value;
-    if (fd) q = q.eq('department', fd);
-    if (fs) q = q.eq('status', fs);
-    if (ft) q = q.eq('request_type', ft);
-    if (fq) q = q.ilike('ticket', `%${fq}%`);
-    if (dfrom) q = q.gte('submitted_at', dfrom + 'T00:00:00');
-    if (dto) q = q.lte('submitted_at', dto + 'T23:59:59');
-    const { data } = await q;
-    ALL = data || [];
-    render(ALL);
+async function load(){
+    let q=db.from('hr_requests').select('*').order('submitted_at',{ascending:false});
+    const fd=document.getElementById('fD').value,fs=document.getElementById('fS').value,ft=document.getElementById('fT').value,fq=document.getElementById('fQ').value.trim().toLowerCase();
+    const dfrom=document.getElementById('dFrom').value,dto=document.getElementById('dTo').value;
+    if(fd)q=q.eq('department',fd);if(fs)q=q.eq('status',fs);if(ft)q=q.eq('request_type',ft);
+    if(fq)q=q.ilike('ticket',`%${fq}%`);
+    if(dfrom)q=q.gte('submitted_at',dfrom+'T00:00:00');if(dto)q=q.lte('submitted_at',dto+'T23:59:59');
+    const{data}=await q;ALL=data||[];render(ALL);
 }
+function subDetail(r){if(r.request_type==='4'&&r.hr_letter_dest)return'الجهة: '+r.hr_letter_dest;if(r.request_type==='5'&&r.complaint_reason)return'سبب: '+r.complaint_reason;if(r.request_type==='8'&&r.violation_reason)return'نوع: '+r.violation_reason;return'—';}
+function slaCheck(r){if(r.status!=='تم الانتهاء'||!r.status_updated_at)return'—';const h=(new Date(r.status_updated_at)-new Date(r.submitted_at))/36e5;return h<=(r.sla_hours||24)?'Ontime':'Out of SLA';}
+function stCls(s){return s==='لم يتم العمل عليه'?'sP':s==='قيد التنفيذ'?'sI':'sD';}
 
-function subDetail(r) {
-    if (r.request_type === '4' && r.hr_letter_dest) return 'الجهة: ' + r.hr_letter_dest;
-    if (r.request_type === '5' && r.complaint_reason) return 'سبب الشكوى: ' + r.complaint_reason;
-    if (r.request_type === '8' && r.violation_reason) return 'نوع المخالفة: ' + r.violation_reason;
-    return '—';
-}
-
-function slaCheck(r) {
-    if (r.status !== 'تم الانتهاء' || !r.status_updated_at) return '—';
-    const hrs = (new Date(r.status_updated_at) - new Date(r.submitted_at)) / 36e5;
-    return hrs <= (r.sla_hours || 24) ? 'Ontime' : 'Out of SLA';
-}
-
-function stCls(s) { return s === 'لم يتم العمل عليه' ? 'sP' : s === 'قيد التنفيذ' ? 'sI' : 'sD'; }
-
-function render(rows) {
-    const tb = document.getElementById('tB');
-    const em = document.getElementById('emMsg');
-    if (!rows.length) { tb.innerHTML = ''; em.style.display = 'block'; return; }
-    em.style.display = 'none';
-    tb.innerHTML = rows.map((r, i) => {
-        const sla = slaCheck(r);
-        const slC = sla === 'Ontime' ? 'sOn' : sla === 'Out of SLA' ? 'sOut' : 'sNA';
-        const dt = new Date(r.submitted_at).toLocaleString('ar-EG', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
-        return `<tr>
+function render(rows){
+    const tb=document.getElementById('tB'),em=document.getElementById('emMsg');
+    if(!rows.length){tb.innerHTML='';em.style.display='block';return;}em.style.display='none';
+    tb.innerHTML=rows.map((r,i)=>{
+        const sla=slaCheck(r),slC=sla==='Ontime'?'sOn':sla==='Out of SLA'?'sOut':'sNA';
+        const dt=new Date(r.submitted_at).toLocaleString('ar-EG',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+        const assignedName=r.assigned_to?supMap[r.assigned_to]||'—':'—';
+        const updatedName=r.updated_by?supMap[r.updated_by]||'—':'—';
+        return`<tr>
             <td class="ro">${i+1}</td>
             <td class="ro" style="font-weight:700;direction:ltr;text-align:center;font-size:10.5px">${r.ticket}</td>
             <td class="ro" style="text-align:center">${r.emp_id}</td>
             <td class="ro" style="direction:ltr;text-align:center">${r.phone}</td>
             <td class="ro">${r.department}</td>
+            <td class="ro">${r.zone||'—'}</td>
             <td class="ro">${r.request_name}</td>
             <td class="ro">${subDetail(r)}</td>
-            <td class="ro" style="max-width:150px">${r.comment || '—'}</td>
+            <td class="ro" style="max-width:150px">${r.comment||'—'}</td>
             <td class="ro" style="white-space:nowrap;font-size:10.5px">${dt}</td>
             <td class="ro" style="font-size:10.5px">${r.sla_text}</td>
             <td class="ro"><span class="st ${slC}">${sla}</span></td>
-            <td class="ro" style="font-size:11px;white-space:nowrap">${r.updated_by ? (supMap[r.updated_by] || '—') : '—'}</td>
-            <td class="ed"><textarea class="fi" data-id="${r.id}" onchange="saveFB(this)">${r.hr_feedback || ''}</textarea></td>
+            <td class="ro"><span class="assign-tag">${assignedName}</span></td>
+            <td class="ro" style="font-size:11px">${updatedName}</td>
+            <td class="ed"><textarea class="fi mention-area" data-id="${r.id}" data-ticket="${r.ticket}" onchange="saveFB(this)" oninput="checkMention(this)">${r.hr_feedback||''}</textarea></td>
             <td class="ed"><select class="ss ${stCls(r.status)}" data-id="${r.id}" onchange="saveST(this)">
                 <option value="لم يتم العمل عليه" ${r.status==='لم يتم العمل عليه'?'selected':''}>لم يتم العمل عليه</option>
                 <option value="قيد التنفيذ" ${r.status==='قيد التنفيذ'?'selected':''}>قيد التنفيذ</option>
@@ -233,47 +249,64 @@ function render(rows) {
     }).join('');
 }
 
+// ========== MENTION SYSTEM ==========
+let activeMentionEl=null;
+function checkMention(el){
+    const val=el.value;const pos=el.selectionStart;
+    // Find @ before cursor
+    const before=val.substring(0,pos);
+    const atIdx=before.lastIndexOf('@');
+    if(atIdx===-1||before.substring(atIdx).includes(' ')){closeMention();return;}
+    const query=before.substring(atIdx+1).toLowerCase();
+    const matches=supList.filter(s=>s.display_name?.toLowerCase().includes(query)||s.username.toLowerCase().includes(query)||s.name.toLowerCase().includes(query));
+    if(!matches.length){closeMention();return;}
+    activeMentionEl=el;
+    const hint=document.getElementById('mentionHint');
+    const rect=el.getBoundingClientRect();
+    hint.style.top=(rect.bottom+window.scrollY+4)+'px';
+    hint.style.right=(window.innerWidth-rect.right)+'px';
+    hint.innerHTML=matches.slice(0,5).map(s=>`<div class="mention-opt" onmousedown="insertMention('${s.id}','${s.name}')">${s.name} (@${s.username})</div>`).join('');
+    hint.classList.add('open');
+}
+function insertMention(uid,name){
+    if(!activeMentionEl)return;
+    const el=activeMentionEl;const val=el.value;const pos=el.selectionStart;
+    const before=val.substring(0,pos);const atIdx=before.lastIndexOf('@');
+    el.value=val.substring(0,atIdx)+'@'+name+' '+val.substring(pos);
+    el.focus();closeMention();
+    // Send notification
+    sendMentionNotif(uid,el.dataset.id,el.dataset.ticket,el.value);
+}
+function closeMention(){document.getElementById('mentionHint').classList.remove('open');activeMentionEl=null;}
+
+async function sendMentionNotif(toUserId,requestId,ticket,message){
+    if(!CU||toUserId===CU.id)return;
+    await db.from('hr_notifications').insert([{to_user_id:toUserId,from_user_id:CU.id,request_id:requestId,ticket:ticket,message:message.substring(0,200)}]);
+}
+
 // ========== SAVE ==========
-async function saveFB(el) {
-    await db.from('hr_requests').update({ hr_feedback: el.value, updated_by: CU?.id || null }).eq('id', el.dataset.id);
+async function saveFB(el){
+    await db.from('hr_requests').update({hr_feedback:el.value,updated_by:CU?.id||null}).eq('id',el.dataset.id);
     showToast();
 }
-
-async function saveST(el) {
-    const u = { status: el.value, updated_by: CU?.id || null };
-    if (el.value === 'تم الانتهاء') u.status_updated_at = new Date().toISOString();
-    else u.status_updated_at = null;
-    await db.from('hr_requests').update(u).eq('id', el.dataset.id);
-    el.className = 'ss ' + stCls(el.value);
-    showToast();
-    setTimeout(load, 500);
+async function saveST(el){
+    const u={status:el.value,updated_by:CU?.id||null};
+    if(el.value==='تم الانتهاء')u.status_updated_at=new Date().toISOString();else u.status_updated_at=null;
+    await db.from('hr_requests').update(u).eq('id',el.dataset.id);
+    el.className='ss '+stCls(el.value);showToast();setTimeout(load,500);
 }
-
-function showToast() {
-    const t = document.getElementById('toast');
-    t.classList.add('pop');
-    setTimeout(() => t.classList.remove('pop'), 2000);
-}
+function showToast(){const t=document.getElementById('toast');t.classList.add('pop');setTimeout(()=>t.classList.remove('pop'),2000);}
 
 // ========== EXPORT ==========
-function expCSV() {
-    if (!ALL.length) { alert('لا توجد بيانات'); return; }
-    let c = '\uFEFF' + 'رقم الطلب,الرقم الوظيفي,الهاتف,الإدارة,نوع الطلب,تفاصيل فرعية,تعليق,تاريخ الإرسال,SLA,الحالة,HR Feedback,تم التنفيذ بواسطة,تاريخ التحديث,Ontime/SLA\n';
-    ALL.forEach(r => {
-        const sla = slaCheck(r);
-        const dt = new Date(r.submitted_at).toLocaleString('ar-EG');
-        const udt = r.status_updated_at ? new Date(r.status_updated_at).toLocaleString('ar-EG') : '';
-        const byName = r.updated_by ? (supMap[r.updated_by] || r.updated_by) : '';
-        c += `${r.ticket},${r.emp_id},${r.phone},${r.department},${r.request_name},"${subDetail(r)}","${r.comment||''}",${dt},${r.sla_text},${r.status},"${r.hr_feedback||''}","${byName}",${udt},${sla}\n`;
-    });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([c], { type: 'text/csv;charset=utf-8;' }));
-    a.download = `HR_Requests_${new Date().toISOString().slice(0,10)}.csv`;
-    a.click();
+function expCSV(){
+    if(!ALL.length){alert('لا توجد بيانات');return;}
+    let c='\uFEFF'+'رقم الطلب,الرقم الوظيفي,الهاتف,الإدارة,المنطقة,نوع الطلب,تفاصيل فرعية,تعليق,تاريخ الإرسال,SLA,الحالة,HR Feedback,مسند إلى,تم التنفيذ بواسطة,تاريخ التحديث,Ontime/SLA\n';
+    ALL.forEach(r=>{const sla=slaCheck(r),dt=new Date(r.submitted_at).toLocaleString('ar-EG'),udt=r.status_updated_at?new Date(r.status_updated_at).toLocaleString('ar-EG'):'',assignName=r.assigned_to?(supMap[r.assigned_to]||''):'',byName=r.updated_by?(supMap[r.updated_by]||''):'';
+    c+=`${r.ticket},${r.emp_id},${r.phone},${r.department},${r.zone||''},${r.request_name},"${subDetail(r)}","${r.comment||''}",${dt},${r.sla_text},${r.status},"${r.hr_feedback||''}","${assignName}","${byName}",${udt},${sla}\n`;});
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'text/csv;charset=utf-8;'}));a.download=`HR_Requests_${new Date().toISOString().slice(0,10)}.csv`;a.click();
 }
-
-// Auto-refresh
-setInterval(load, 30000);
+// Refresh
+setInterval(()=>{load();loadNotifs();},30000);
 </script>
 </body>
 </html>
